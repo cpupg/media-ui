@@ -47,7 +47,7 @@ export interface TagDrawerPropsType {
 
 const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
   const { resourceId, tagList, visible, onClose, renderTitle, dbTagList, setVisible } = props;
-  const [newTag, setNewTag] = useState("");
+  const [newTag, setNewTag] = useState('');
   const dispatch = useDispatch();
   const editInputRef = useRef(null);
 
@@ -60,8 +60,8 @@ const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
     });
   }, [dispatch, resourceId]);
 
-
-  const { run: handleInputChangeDe } = useDebounceFn(() => {
+  const { run: handleInputChangeDe } = useDebounceFn(
+    () => {
       if (newTag.length == 0) {
         return;
       }
@@ -78,10 +78,27 @@ const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTag(e.target.value);
     handleInputChangeDe();
-  }
-
+  };
 
   const addNewTag = () => {
+    if (newTag.indexOf(',') > 0) {
+      const tags: string[] = newTag.split(',');
+      for (let t in tags) {
+        if (t.length == 0 || t.length > 10) {
+          message.warn('标签为空或超过10位');
+          return;
+        }
+        dispatch({
+          type: 'resource/addTag',
+          payload: {
+            resourceId,
+            tagName: t,
+          },
+        });
+      }
+      setNewTag('');
+      return;
+    }
     if (newTag.length == 0 || newTag.length > 10) {
       message.warn('标签为空或超过10位');
       return;
