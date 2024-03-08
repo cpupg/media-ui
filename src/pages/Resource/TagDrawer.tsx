@@ -1,9 +1,9 @@
 import FavoriteTag from '@/components/Common/tagFc/FavoriteTag';
 import RateTag from '@/components/Common/tagFc/RateTag';
 import ResourceTags from '@/components/Common/tagFc/ResourceTag';
-import type { ModelType } from '@/types/model';
 import type TagReferenceVo from '@/types/entity';
 import type { TagVo } from '@/types/entity';
+import type { ModelType } from '@/types/model';
 import { useDebounceFn } from 'ahooks';
 import { Divider, Drawer, Input, Tag, message } from 'antd';
 import type { CSSProperties, ReactNode } from 'react';
@@ -81,9 +81,9 @@ const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
   };
 
   const addNewTag = () => {
-    if (newTag.indexOf(',') > 0) {
+    if (newTag.indexOf(',') > -1) {
       const tags: string[] = newTag.split(',');
-      for (let t in tags) {
+      tags.forEach((t) => {
         if (t.length == 0 || t.length > 10) {
           message.warn('标签为空或超过10位');
           return;
@@ -95,7 +95,7 @@ const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
             tagName: t,
           },
         });
-      }
+      });
       setNewTag('');
       return;
     }
@@ -165,6 +165,7 @@ const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
       <Input
         placeholder="按回车添加标签，点击模糊查询查看相似标签"
         ref={editInputRef}
+        value={newTag}
         onChange={handleInputChange}
         type="text"
         size="small"
