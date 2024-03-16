@@ -92,17 +92,9 @@ const Resource: React.FC<ResourceProps> = () => {
     {
       title: '文件名',
       dataIndex: 'filename',
-      width: 350,
+      width: 200,
       ellipsis: true,
       copyable: true,
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '必须填写件名',
-          },
-        ],
-      },
     },
     {
       title: '资源目录',
@@ -110,14 +102,6 @@ const Resource: React.FC<ResourceProps> = () => {
       dataIndex: 'dir',
       ellipsis: true,
       copyable: true,
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '必须填写资源目录',
-          },
-        ],
-      },
     },
     {
       title: '作者',
@@ -139,9 +123,12 @@ const Resource: React.FC<ResourceProps> = () => {
     // },
     {
       title: '标签',
-      hideInSearch: true,
+      dataIndex: 'tags',
       width: 330,
       ellipsis: true,
+      fieldProps: {
+        placeHolder: '支持逗号分隔',
+      },
       onCell: (data) => ({
         onClick: () => onTagClick(data),
       }),
@@ -251,15 +238,27 @@ const Resource: React.FC<ResourceProps> = () => {
         actionRef={actionRef}
         defaultSize="small"
         columns={columns}
-        request={async (params, sorter, filter) =>
-          fetchResourceList({ params, sorter, filter }).then((v) => {
+        request={async (params, sorter, filter) => {
+          if (params.tags) {
+            const tags: string = params.tags;
+            const tagNames: string[] = [];
+            const arr = tags.split(',');
+            arr.forEach((a) => {
+              const at = a.trim();
+              if (at.length > 0) {
+                tagNames.push(at);
+              }
+            });
+            params.tagNames = tagNames;
+          }
+          return fetchResourceList({ params, sorter, filter }).then((v) => {
             if (v.success) {
               return v;
             } else {
               message.error(v.message);
             }
-          })
-        }
+          });
+        }}
         toolBarRender={() => <ResourceFormModal reload={reload} />}
       />
       {drawerVisible && (
