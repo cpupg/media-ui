@@ -126,9 +126,6 @@ const Resource: React.FC<ResourceProps> = () => {
       dataIndex: 'tags',
       width: 330,
       ellipsis: true,
-      fieldProps: {
-        placeHolder: '支持逗号分隔',
-      },
       onCell: (data) => ({
         onClick: () => onTagClick(data),
       }),
