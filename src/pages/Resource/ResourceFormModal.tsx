@@ -91,7 +91,7 @@ const ResourceFormModal: React.FC<ModalType> = (props: ModalType) => {
     <ModalForm
       onFinish={onFinish}
       title="添加资源"
-      trigger={<Button>新建</Button>}
+      trigger={<Button type='primary'>新建</Button>}
       modalProps={{ onCancel: onCancel }}
       visible={visible}
       form={form}

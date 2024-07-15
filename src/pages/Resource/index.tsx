@@ -4,9 +4,11 @@ import ImageUpload from '@/components/Common/upload/ImageUpload';
 import { fetchResourceList } from '@/services/resource/resource';
 import type { ResourceVo } from '@/types/entity';
 import type { ModelType } from '@/types/model';
+import { ProFormInstance } from '@ant-design/pro-form';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Modal, Popconfirm, Tooltip, message } from 'antd';
+import { TableRowSelection } from 'antd/lib/table/interface';
 import copy from 'copy-to-clipboard';
 import React, { useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
@@ -20,6 +22,7 @@ interface ResourceProps {
 const Resource: React.FC<ResourceProps> = () => {
   const dispatch = useDispatch();
   const actionRef = useRef<ActionType>();
+  const formRef = useRef<ProFormInstance>();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [resourceId, setResourceId] = useState('');
   const [currentResource, setCurrentResource] = useState<ResourceVo>();
@@ -27,8 +30,9 @@ const Resource: React.FC<ResourceProps> = () => {
   // 修改弹窗，使用的是添加弹窗，只是多了id字段。
   const [modifyVisible, setModifyVisible] = useState(false);
   // 要修改的资源
-  const [resToModify, setResToModify] = useState();
+  const [resToModify, setResToModify] = useState<ResourceVo>();
   const [showPreview, setShowPreview] = useState(false);
+  const [selectRows, setSelectRows] = useState<ResourceVo[]>();
 
   const reload = () => {
     actionRef.current?.reload();
@@ -159,6 +163,13 @@ const Resource: React.FC<ResourceProps> = () => {
       width: 150,
     },
     {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      valueType: 'dateTime',
+      hideInSearch: true,
+      width: 150,
+    },
+    {
       title: '操作',
       hideInSearch: true,
       width: 255,
@@ -228,11 +239,32 @@ const Resource: React.FC<ResourceProps> = () => {
     });
   };
 
+  const batchDelete = () => {
+    const params = formRef.current?.getFieldsValue();
+    const idList = selectRows?.map((r) => r.id);
+    dispatch({
+      type: 'resource/batchDelete',
+      payload: {
+        params,
+        idList,
+      },
+    });
+    reload();
+  };
+
+  const rowSelection: TableRowSelection<ResourceVo> = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: ResourceVo[]) => {
+      setSelectRows(selectedRows);
+    },
+  };
+
   return (
     <div>
       <ProTable<ResourceVo>
         rowKey="id"
+        rowSelection={rowSelection}
         actionRef={actionRef}
+        formRef={formRef}
         defaultSize="small"
         columns={columns}
         request={async (params, sorter, filter) => {
@@ -256,7 +288,12 @@ const Resource: React.FC<ResourceProps> = () => {
             }
           });
         }}
-        toolBarRender={() => <ResourceFormModal reload={reload} />}
+        toolBarRender={() => [
+          <ResourceFormModal key={1} reload={reload} />,
+          <Button onClick={batchDelete} key={2}>
+            批量删除
+          </Button>,
+        ]}
       />
       {drawerVisible && (
         <TagDrawer
