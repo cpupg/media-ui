@@ -32,7 +32,7 @@ const Resource: React.FC<ResourceProps> = () => {
   // 要修改的资源
   const [resToModify, setResToModify] = useState<ResourceVo>();
   const [showPreview, setShowPreview] = useState(false);
-  const [selectRows, setSelectRows] = useState<ResourceVo[]>();
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>();
 
   const reload = () => {
     actionRef.current?.reload();
@@ -241,7 +241,7 @@ const Resource: React.FC<ResourceProps> = () => {
 
   const batchDelete = () => {
     const params = formRef.current?.getFieldsValue();
-    const idList = selectRows?.map((r) => r.id);
+    const idList = selectedRowKeys;
     dispatch({
       type: 'resource/batchDelete',
       payload: {
@@ -254,14 +254,16 @@ const Resource: React.FC<ResourceProps> = () => {
 
   const rowSelection: TableRowSelection<ResourceVo> = {
     onChange: (selectedRowKeys: React.Key[], selectedRows: ResourceVo[]) => {
-      setSelectRows(selectedRows);
+      setSelectedRowKeys(selectedRowKeys);
     },
+    selectedRowKeys: selectedRowKeys,
   };
 
   return (
     <div>
       <ProTable<ResourceVo>
         rowKey="id"
+        onLoad={() => setSelectedRowKeys([])}
         rowSelection={rowSelection}
         actionRef={actionRef}
         formRef={formRef}
