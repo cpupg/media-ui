@@ -1,6 +1,7 @@
 import {
   addResource,
   addTag,
+  batchDelete,
   deleteResource,
   deleteTag,
   fetchResourceList,
@@ -46,6 +47,7 @@ export interface ResourceModelType {
     setAlbum: Effect;
     unsetAlbum: Effect;
     queryAlbumList: Effect;
+    batchDelete: Effect;
   };
   reducers: {
     setResourceList: Reducer;
@@ -148,6 +150,10 @@ const ResourceMode: ResourceModelType = {
           payload: data,
         });
       }
+    },
+    *batchDelete({ payload }, { put, call }) {
+      const data: ResponseData<any> = yield call(batchDelete, payload);
+      parseResponse(data);
     },
   },
   reducers: {

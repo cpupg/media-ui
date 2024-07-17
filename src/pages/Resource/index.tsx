@@ -4,9 +4,11 @@ import ImageUpload from '@/components/Common/upload/ImageUpload';
 import { fetchResourceList } from '@/services/resource/resource';
 import type { ResourceVo } from '@/types/entity';
 import type { ModelType } from '@/types/model';
+import { ProFormInstance } from '@ant-design/pro-form';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Modal, Popconfirm, Tooltip, message } from 'antd';
+import { TableRowSelection } from 'antd/lib/table/interface';
 import copy from 'copy-to-clipboard';
 import React, { useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
@@ -20,6 +22,7 @@ interface ResourceProps {
 const Resource: React.FC<ResourceProps> = () => {
   const dispatch = useDispatch();
   const actionRef = useRef<ActionType>();
+  const formRef = useRef<ProFormInstance>();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [resourceId, setResourceId] = useState('');
   const [currentResource, setCurrentResource] = useState<ResourceVo>();
@@ -27,8 +30,9 @@ const Resource: React.FC<ResourceProps> = () => {
   // 修改弹窗，使用的是添加弹窗，只是多了id字段。
   const [modifyVisible, setModifyVisible] = useState(false);
   // 要修改的资源
-  const [resToModify, setResToModify] = useState();
+  const [resToModify, setResToModify] = useState<ResourceVo>();
   const [showPreview, setShowPreview] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>();
 
   const reload = () => {
     actionRef.current?.reload();
@@ -92,17 +96,9 @@ const Resource: React.FC<ResourceProps> = () => {
     {
       title: '文件名',
       dataIndex: 'filename',
-      width: 350,
+      width: 200,
       ellipsis: true,
       copyable: true,
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '必须填写件名',
-          },
-        ],
-      },
     },
     {
       title: '资源目录',
@@ -110,14 +106,6 @@ const Resource: React.FC<ResourceProps> = () => {
       dataIndex: 'dir',
       ellipsis: true,
       copyable: true,
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '必须填写资源目录',
-          },
-        ],
-      },
     },
     {
       title: '作者',
@@ -139,7 +127,7 @@ const Resource: React.FC<ResourceProps> = () => {
     // },
     {
       title: '标签',
-      hideInSearch: true,
+      dataIndex: 'tags',
       width: 330,
       ellipsis: true,
       onCell: (data) => ({
@@ -170,6 +158,13 @@ const Resource: React.FC<ResourceProps> = () => {
     {
       title: '创建时间',
       dataIndex: 'createTime',
+      valueType: 'dateTime',
+      hideInSearch: true,
+      width: 150,
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
       valueType: 'dateTime',
       hideInSearch: true,
       width: 150,
@@ -244,23 +239,63 @@ const Resource: React.FC<ResourceProps> = () => {
     });
   };
 
+  const batchDelete = () => {
+    const params = formRef.current?.getFieldsValue();
+    const idList = selectedRowKeys;
+    dispatch({
+      type: 'resource/batchDelete',
+      payload: {
+        params,
+        idList,
+      },
+    });
+    reload();
+  };
+
+  const rowSelection: TableRowSelection<ResourceVo> = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: ResourceVo[]) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    selectedRowKeys: selectedRowKeys,
+  };
+
   return (
     <div>
       <ProTable<ResourceVo>
         rowKey="id"
+        onLoad={() => setSelectedRowKeys([])}
+        rowSelection={rowSelection}
         actionRef={actionRef}
+        formRef={formRef}
         defaultSize="small"
         columns={columns}
-        request={async (params, sorter, filter) =>
-          fetchResourceList({ params, sorter, filter }).then((v) => {
+        request={async (params, sorter, filter) => {
+          if (params.tags) {
+            const tags: string = params.tags;
+            const tagNames: string[] = [];
+            const arr = tags.split(',');
+            arr.forEach((a) => {
+              const at = a.trim();
+              if (at.length > 0) {
+                tagNames.push(at);
+              }
+            });
+            params.tagNames = tagNames;
+          }
+          return fetchResourceList({ params, sorter, filter }).then((v) => {
             if (v.success) {
               return v;
             } else {
               message.error(v.message);
             }
-          })
-        }
-        toolBarRender={() => <ResourceFormModal reload={reload} />}
+          });
+        }}
+        toolBarRender={() => [
+          <ResourceFormModal key={1} reload={reload} />,
+          <Button onClick={batchDelete} key={2}>
+            批量删除
+          </Button>,
+        ]}
       />
       {drawerVisible && (
         <TagDrawer
