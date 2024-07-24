@@ -1,5 +1,4 @@
 import AuthorSelectorModal from '@/components/Common/selectorModal/AuthorSelectorModal';
-import ImageUpload from '@/components/Common/upload/ImageUpload';
 import type { AuthorVo, ResourceVo } from '@/types/entity';
 import { ModalForm, ProFormText } from '@ant-design/pro-form';
 import { Button, Form } from 'antd';
@@ -119,7 +118,6 @@ const ResourceFormModal: React.FC<ModalType> = (props: ModalType) => {
       <ProFormText
         fieldProps={{
           onClick: () => setAuthorVisible(true),
-          onFocus: () => setAuthorVisible(true),
         }}
         label="作者姓名"
         name="authorName"
