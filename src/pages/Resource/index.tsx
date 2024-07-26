@@ -263,6 +263,7 @@ const Resource: React.FC<ResourceProps> = () => {
     <div>
       <ProTable<ResourceVo>
         rowKey="id"
+        pagination={{ showQuickJumper: true }}
         onLoad={() => setSelectedRowKeys([])}
         rowSelection={rowSelection}
         actionRef={actionRef}
@@ -292,9 +293,9 @@ const Resource: React.FC<ResourceProps> = () => {
         }}
         toolBarRender={() => [
           <ResourceFormModal key={1} reload={reload} />,
-          <Button onClick={batchDelete} key={2}>
-            批量删除
-          </Button>,
+          <Popconfirm key={2} title="批量删除" onConfirm={batchDelete}>
+            <Button>批量删除</Button>
+          </Popconfirm>,
         ]}
       />
       {drawerVisible && (

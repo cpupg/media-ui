@@ -83,6 +83,7 @@ const Site: React.FC<SiteStateType> = (props) => {
     <div>
       <ProTable<SiteVo>
         actionRef={actionRef}
+        pagination={{ showQuickJumper: true }}
         rowKey="id"
         defaultSize="small"
         columns={columns}
