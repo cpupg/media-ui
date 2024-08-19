@@ -81,8 +81,18 @@ const ImageUpload: React.FC<PropsType> = (props) => {
       });
   };
 
+  const refresh = () => {
+    dispatch({
+      type: 'upload/imageUpload/queryFileList',
+      payload: {
+        businessCode,
+      },
+    });
+  }
+
   return (
     <>
+      <Button style={{marginBottom: 10}} size='small' onClick={refresh}>刷新</Button>
       <Upload
         listType="picture-card"
         data={{ businessCode, businessType }}
