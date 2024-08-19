@@ -13,6 +13,7 @@ import copy from 'copy-to-clipboard';
 import React, { useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import Album from './Album';
+import BatchUpdateFormModal from './BatchUpdateFormModal';
 import ResourceFormModal from './ResourceFormModal';
 import TagDrawer from './TagDrawer';
 interface ResourceProps {
@@ -119,12 +120,6 @@ const Resource: React.FC<ResourceProps> = () => {
       },
       width: 100,
     },
-    // {
-    //   title: '专辑',
-    //   hideInSearch: true,
-    //   dataIndex: ['albumVo', 'albumName'],
-    //   width: 150,
-    // },
     {
       title: '标签',
       dataIndex: 'tags',
@@ -296,6 +291,11 @@ const Resource: React.FC<ResourceProps> = () => {
           <Popconfirm key={2} title="批量删除" onConfirm={batchDelete}>
             <Button>批量删除</Button>
           </Popconfirm>,
+          <BatchUpdateFormModal
+            key={3}
+            condition={{ params: formRef.current?.getFieldsValue(), idList: selectedRowKeys }}
+            reload={reload}
+          />,
         ]}
       />
       {drawerVisible && (

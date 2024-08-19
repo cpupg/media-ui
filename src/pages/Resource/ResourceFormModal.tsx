@@ -5,7 +5,7 @@ import { Button, Form } from 'antd';
 import React, { useState } from 'react';
 import { useDispatch } from 'umi';
 
-interface ModalType {
+interface PropsType {
   /**
    * 刷新父组件。
    */
@@ -52,7 +52,7 @@ interface FormType {
   albumName?: string;
 }
 
-const ResourceFormModal: React.FC<ModalType> = (props: ModalType) => {
+const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
   const { reload, data, visible, onCancel } = props;
 
   const [authorVisible, setAuthorVisible] = useState(false);

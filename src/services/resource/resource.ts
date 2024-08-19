@@ -84,3 +84,10 @@ export async function batchDelete(payload: { albumResourceId: string }) {
     method: 'POST',
   });
 }
+
+export async function batchUpdate(payload: { albumResourceId: string }) {
+  return request('/api/resource/batchUpdate', {
+    data: payload,
+    method: 'POST',
+  });
+}
