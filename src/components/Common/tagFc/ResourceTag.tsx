@@ -3,25 +3,26 @@ import { Tag } from 'antd';
 import React from 'react';
 import { useDispatch } from 'umi';
 import './resourceTag.css';
+import consts from '../consts';
 
-// 颜色数组，用于给标签着色
-const colorArray = [
-  '#ffa39e',
-  '#ffa940',
-  '#fff1b8',
-  '#ffc53d',
-  '#73d13d',
-  '#5cdbd3',
-  '#4096ff',
-  '#b37feb',
-  '#f759ab',
-  '#ffd6e7',
-];
+const { colorArray } = consts;
 
 export interface ResourceTagPropsType {
+  /**
+   * 标签列表，由父组件传入。
+   */
   tagList: TagReferenceVo[];
+  /**
+   * 是否可编辑。
+   */
   editable?: boolean;
+  /**
+   * 资源标识，由父组件传入。
+   */
   resourceId?: string;
+  /**
+   * 标签总数。
+   */
   totalCount?: number;
   /**
    * 标签数量大于5后，是否展示提示内容。

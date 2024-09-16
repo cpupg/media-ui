@@ -1,3 +1,4 @@
+import consts from '@/components/Common/consts';
 import FavoriteTag from '@/components/Common/tagFc/FavoriteTag';
 import RateTag from '@/components/Common/tagFc/RateTag';
 import ResourceTags from '@/components/Common/tagFc/ResourceTag';
@@ -10,30 +11,30 @@ import type { CSSProperties, ReactNode } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 
-const colorArray = [
-  '#ffa39e',
-  '#ffa940',
-  '#fff1b8',
-  '#ffc53d',
-  '#73d13d',
-  '#5cdbd3',
-  '#4096ff',
-  '#b37feb',
-  '#f759ab',
-  '#ffd6e7',
-];
+const { colorArray } = consts;
 
 export interface TagDrawerPropsType {
   /**
-   * 当前资源拥有的标签。
+   * redux管理的当前资源拥有的标签。
    */
   tagList: TagReferenceVo[];
   /**
-   * 模糊查询输入框输入内容。
+   * redux管理的模糊查询输入框输入内容。
    */
   dbTagList: TagVo[];
+  /**
+   * 资源标识，父组件传入。
+   */
   resourceId: string;
+  /**
+   * 设置可见性。
+   * @param v 可见性。
+   * @returns void
+   */
   setVisible: (v: boolean) => void;
+  /**
+   * 可见性。
+   */
   visible: boolean;
   /**
    * 关闭时调用。
@@ -133,7 +134,7 @@ const TagDrawer: React.FC<TagDrawerPropsType> = (props) => {
   };
 
   /**
-   * 选然searchTag查到的标签，点击标签可以为当前资源添加标签。
+   * 渲染searchTag查到的标签，点击标签可以为当前资源添加标签。
    */
   const renderTagArea = () => {
     return (
