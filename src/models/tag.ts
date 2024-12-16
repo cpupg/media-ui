@@ -1,4 +1,10 @@
-import { addTag, queryTagList, queryTagReferenceList } from '@/services/tag';
+import {
+  addTag,
+  queryResourceList,
+  queryTagList,
+  queryTagReferenceList,
+  removeTagFromResource,
+} from '@/services/tag';
 import { parseResponse, parseTableResponse } from '@/utils/utils';
 import type { Effect, Reducer } from 'umi';
 import type TagReferenceVo from '../types/entity';
@@ -64,6 +70,14 @@ export interface TagModelType {
      * 查询当前资源是否被收藏，tag_reference表resource_id=当前资源且name=收藏。
      */
     queryCurrentFavorite: Effect;
+    /**
+     * 根据资源标识查询资源的标签.
+     */
+    queryResourceList: Effect;
+    /**
+     * 删除资源拥有的标签。
+     */
+    removeTagFromResource: Effect;
   };
   reducers: {
     setTagList: Reducer<TagStateType>;
@@ -175,6 +189,21 @@ const model: TagModelType = {
           type: 'setCurrentFavorite',
           payload: data.data.length === 1 ? data.data[0] : null,
         });
+      }
+    },
+    *queryResourceList({ payload }, { call, put }) {
+      const data: ResponseData<TagReferenceVo> = yield call(queryResourceList, payload);
+      if (parseResponse(data)) {
+        yield put({
+          type: 'setTagList',
+          payload: data.data,
+        });
+      }
+    },
+    *removeTagFromResource({ payload }, { call, put }) {
+      const data: ResponseData<TagReferenceVo> = yield call(removeTagFromResource, payload);
+      if (parseResponse(data)) {
+        message.success('删除成功');
       }
     },
   },

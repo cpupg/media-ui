@@ -1,5 +1,5 @@
 import TagReferenceVo from '@/types/entity';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import TagInput from '.';
 import { ModelType } from '@/types/model';
@@ -27,6 +27,13 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   // 当前输入框的标签
   const [value, setValue] = useState<string>('');
 
+  useEffect(() => {
+    dispatch({
+      type: 'tag/queryResourceList',
+      payload: { resourceId },
+    });
+  }, [dispatch]);
+
   const onEnter = (value: string) => {
     if (tagList?.map((t) => t.tagVo.name).includes(value)) {
       return;
@@ -47,11 +54,20 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   };
 
   const onClose = (value: string) => {
+    if(!tagList) {
+      return;
+    }
+    const v: TagReferenceVo[] = tagList?.filter((p) => p.tagVo.name == value);
     dispatch({
       type: 'tag/removeTagFromResource',
       payload: {
-        tagReferenceId: '',
+        referenceId: v[0].id,
+        resourceId: v[0].resourceId,
       },
+    });
+    dispatch({
+      type: 'tag/queryResourceList',
+      payload: { resourceId },
     });
   };
 
@@ -76,4 +92,4 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   );
 };
 
-export default connect(({ tag: { tagList } }: ModelType) => tagList)(ResourceTag);
+export default connect(({ tag: { tagList } }: ModelType) => ({ ...tagList }))(ResourceTag);

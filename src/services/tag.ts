@@ -23,3 +23,19 @@ export async function addTag(params: { resourceId: string; tagId: string }) {
     requestType: 'form',
   });
 }
+
+export async function queryResourceList(resourceId: string) {
+  return request('/api/tag/queryResourceList', {
+    method: 'POST',
+    data: resourceId,
+    requestType: 'form',
+  });
+}
+
+export async function removeTagFromResource(payload: { referenceId: string; resourceId: string }) {
+  return request('/api/tag/removeTagFromResource', {
+    method: 'POST',
+    data: payload,
+    requestType: 'form',
+  });
+}
