@@ -1,5 +1,6 @@
 import {
   addTag,
+  addTagToResource,
   queryResourceList,
   queryTagList,
   queryTagReferenceList,
@@ -36,6 +37,10 @@ export interface TagStateType {
    * 当前资源的收藏。
    */
   currentFavorite: TagReferenceVo | null;
+  /**
+   * 当前资源下的标签。
+   */
+  tagReferenceVoList: TagReferenceVo[];
 }
 
 export interface TagModelType {
@@ -78,13 +83,18 @@ export interface TagModelType {
      * 删除资源拥有的标签。
      */
     removeTagFromResource: Effect;
+    /**
+     * 给资源添加标签。
+     */
+    addTagToResource: Effect;
   };
   reducers: {
-    setTagList: Reducer<TagStateType>;
-    setRateTagList: Reducer<TagStateType>;
-    setFavoriteTagList: Reducer<TagStateType>;
-    setCurrentRate: Reducer<TagReferenceVo>;
-    setCurrentFavorite: Reducer<TagReferenceVo>;
+    setTagList: Reducer;
+    setRateTagList: Reducer;
+    setFavoriteTagList: Reducer;
+    setCurrentRate: Reducer;
+    setCurrentFavorite: Reducer;
+    setTagReferenceVoList: Reducer;
   };
 }
 
@@ -96,6 +106,7 @@ const model: TagModelType = {
     rateTagList: [],
     currentRate: null,
     currentFavorite: null,
+    tagReferenceVoList: [],
   },
   effects: {
     *queryTagList({ payload }, { call, put }) {
@@ -192,10 +203,10 @@ const model: TagModelType = {
       }
     },
     *queryResourceList({ payload }, { call, put }) {
-      const data: ResponseData<TagReferenceVo> = yield call(queryResourceList, payload);
+      const data: ResponseData<TagReferenceVo[]> = yield call(queryResourceList, payload);
       if (parseResponse(data)) {
         yield put({
-          type: 'setTagList',
+          type: 'setTagReferenceVoList',
           payload: data.data,
         });
       }
@@ -204,6 +215,17 @@ const model: TagModelType = {
       const data: ResponseData<TagReferenceVo> = yield call(removeTagFromResource, payload);
       if (parseResponse(data)) {
         message.success('删除成功');
+      }
+    },
+    *addTagToResource({ payload }, { call, put }) {
+      const data: ResponseData<TagReferenceVo> = yield call(addTagToResource, payload);
+      if (parseResponse(data)) {
+        yield put({
+          type: 'tag/queryResourceList',
+          payload: {
+            resourceId: payload.resourceId,
+          },
+        });
       }
     },
   },
@@ -236,6 +258,12 @@ const model: TagModelType = {
       return {
         ...state,
         currentFavorite: payload,
+      };
+    },
+    setTagReferenceVoList(state, { payload }) {
+      return {
+        ...state,
+        tagReferenceVoList: payload,
       };
     },
   },

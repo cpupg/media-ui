@@ -39,3 +39,10 @@ export async function removeTagFromResource(payload: { referenceId: string; reso
     requestType: 'form',
   });
 }
+
+export async function addTagToResource(payload: { referenceId: string; resourceId: string }) {
+  return request('/api/tag/addTagToResource', {
+    method: 'POST',
+    data: payload,
+  });
+}

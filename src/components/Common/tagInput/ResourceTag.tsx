@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import TagInput from '.';
 import { ModelType } from '@/types/model';
+import { message } from 'antd';
 
 interface PropsType {
   /**
@@ -35,18 +36,23 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   }, [dispatch]);
 
   const onEnter = (value: string) => {
-    if (tagList?.map((t) => t.tagVo.name).includes(value)) {
+    if (value.length === 0) {
+      message.warn('标签为空');
       return;
     }
-    setValue('');
-    dispatch({
-      type: 'tag/addTagToResource',
-      payload: {
-        name: value,
-        resourceId: resourceId,
-        tagReferenceId: resourceId,
-      },
+    value.split(',').forEach((v) => {
+      if (tagList?.map((t) => t.tagVo.name).includes(v)) {
+        return;
+      }
+      dispatch({
+        type: 'tag/addTagToResource',
+        payload: {
+          name: v.trim(),
+          resourceId: resourceId,
+        },
+      });
     });
+    setValue('');
   };
 
   const onChange = (current: string) => {
@@ -54,10 +60,10 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   };
 
   const onClose = (value: string) => {
-    if(!tagList) {
+    if (!tagList) {
       return;
     }
-    const v: TagReferenceVo[] = tagList?.filter((p) => p.tagVo.name == value);
+    const v: TagReferenceVo[] = tagList?.filter((p) => p?.tagVo?.name == value);
     dispatch({
       type: 'tag/removeTagFromResource',
       payload: {
@@ -74,7 +80,7 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   const valueList = (): string[] => {
     if (tagList && tagList.length > 0) {
       // @ts-ignore
-      return tagList.map((t) => t.tagVo.name);
+      return tagList.map((t) => t?.tagVo?.name);
     }
     const arr: string[] = [];
     return arr;
@@ -92,4 +98,6 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   );
 };
 
-export default connect(({ tag: { tagList } }: ModelType) => ({ ...tagList }))(ResourceTag);
+export default connect(({ tag: { tagReferenceVoList } }: ModelType) => ({
+  tagList: tagReferenceVoList,
+}))(ResourceTag);
