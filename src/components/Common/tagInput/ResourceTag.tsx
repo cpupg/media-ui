@@ -1,9 +1,10 @@
-import TagReferenceVo from '@/types/entity';
+import TagReferenceVo, { TagVo } from '@/types/entity';
+import { ModelType } from '@/types/model';
+import { useDebounceFn } from 'ahooks';
+import { message, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import TagInput from '.';
-import { ModelType } from '@/types/model';
-import { message } from 'antd';
 
 interface PropsType {
   /**
@@ -13,7 +14,15 @@ interface PropsType {
   /**
    * 标签列表，查表获取。
    */
-  tagList?: TagReferenceVo[];
+  tagList: TagReferenceVo[];
+  /**
+   * 是否展示模糊搜索结果。
+   */
+  search?: boolean;
+  /**
+   * 模糊搜索结果。
+   */
+  searchResult: TagVo[];
 }
 /**
  * 展示资源关联的标签，可以向资源增删标签。
@@ -21,7 +30,7 @@ interface PropsType {
  * @returns 组件
  */
 const ResourceTag: React.FC<PropsType> = (props) => {
-  const { resourceId, tagList } = props;
+  const { resourceId, tagList, search, searchResult } = props;
 
   const dispatch = useDispatch();
   // 标签列表，从后台获取，添加新标签后刷新
@@ -55,8 +64,20 @@ const ResourceTag: React.FC<PropsType> = (props) => {
     setValue('');
   };
 
+  const { run: onSearch } = useDebounceFn((value: string) => {
+    dispatch({
+      type: 'tag/queryList',
+      payload: {
+        name: value.trim(),
+      },
+    });
+  });
+
   const onChange = (current: string) => {
     setValue(current);
+    if (search && current.length > 0) {
+      onSearch(current);
+    }
   };
 
   const onClose = (value: string) => {
@@ -86,18 +107,30 @@ const ResourceTag: React.FC<PropsType> = (props) => {
     return arr;
   };
 
+  const renderSearchResult = () => {
+    return searchResult.map((t) => (
+      <Tag key={t.id} onClick={(e) => onEnter(t.name)}>
+        {t.name}
+      </Tag>
+    ));
+  };
+
   return (
-    <TagInput
-      onEnter={onEnter}
-      onClose={onClose}
-      onValueChange={onChange}
-      close={true}
-      valueList={valueList()}
-      value={value}
-    />
+    <React.Fragment>
+      <TagInput
+        onEnter={onEnter}
+        onClose={onClose}
+        onValueChange={onChange}
+        close={true}
+        valueList={valueList()}
+        value={value}
+      />
+      {search && renderSearchResult()}
+    </React.Fragment>
   );
 };
 
-export default connect(({ tag: { tagReferenceVoList } }: ModelType) => ({
+export default connect(({ tag: { tagReferenceVoList, tagList } }: ModelType) => ({
   tagList: tagReferenceVoList,
+  searchResult: tagList,
 }))(ResourceTag);

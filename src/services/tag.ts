@@ -2,8 +2,8 @@ import type { TagReferenceParam } from '@/types/request/tag';
 import type { TableRequest } from '@/types/request/table';
 import request from '@/utils/request';
 
-export async function queryTagList(data: { name: string }) {
-  return request('/api/tag/queryTagList', {
+export async function queryList(data: { name: string }) {
+  return request('/api/tag/queryList', {
     method: 'POST',
     data: data,
   });

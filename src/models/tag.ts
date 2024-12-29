@@ -2,7 +2,7 @@ import {
   addTag,
   addTagToResource,
   queryResourceList,
-  queryTagList,
+  queryList,
   queryTagReferenceList,
   removeTagFromResource,
 } from '@/services/tag';
@@ -18,7 +18,7 @@ import { StatusCode } from '../types/response/enum';
 
 export interface TagStateType {
   /**
-   * tag表查到的标签。
+   * tag表模糊查询结果。
    */
   tagList: TagVo[];
   /**
@@ -50,7 +50,7 @@ export interface TagModelType {
     /**
      * 查询标签列表，tag表。
      */
-    queryTagList: Effect;
+    queryList: Effect;
     /**
      * 查询用来打分的标签列表，tag表里name=0-10。
      */
@@ -109,8 +109,8 @@ const model: TagModelType = {
     tagReferenceVoList: [],
   },
   effects: {
-    *queryTagList({ payload }, { call, put }) {
-      const data: TableResponse<TagVo> = yield call(queryTagList, payload);
+    *queryList({ payload }, { call, put }) {
+      const data: TableResponse<TagVo> = yield call(queryList, payload);
       if (parseTableResponse(data)) {
         yield put({
           type: 'setTagList',
@@ -119,7 +119,7 @@ const model: TagModelType = {
       }
     },
     *queryRateTagList({ payload }, { call, put }) {
-      const data: TableResponse<TagVo> = yield call(queryTagList, payload);
+      const data: TableResponse<TagVo> = yield call(queryList, payload);
       if (parseTableResponse(data)) {
         yield put({
           type: 'setRateTagList',
@@ -128,7 +128,7 @@ const model: TagModelType = {
       }
     },
     *queryFavoriteTag({ payload }, { call, put }) {
-      const data: TableResponse<TagVo> = yield call(queryTagList, payload);
+      const data: TableResponse<TagVo> = yield call(queryList, payload);
       if (parseTableResponse(data)) {
         yield put({
           type: 'setFavoriteTagList',
