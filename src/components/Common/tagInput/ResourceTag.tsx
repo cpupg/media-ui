@@ -64,14 +64,17 @@ const ResourceTag: React.FC<PropsType> = (props) => {
     setValue('');
   };
 
-  const { run: onSearch } = useDebounceFn((value: string) => {
-    dispatch({
-      type: 'tag/queryList',
-      payload: {
-        name: value.trim(),
-      },
-    });
-  });
+  const { run: onSearch } = useDebounceFn(
+    (value: string) => {
+      dispatch({
+        type: 'tag/queryList',
+        payload: {
+          name: value.trim(),
+        },
+      });
+    },
+    { wait: 500 },
+  );
 
   const onChange = (current: string) => {
     setValue(current);
