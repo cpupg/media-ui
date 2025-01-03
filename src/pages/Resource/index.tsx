@@ -1,5 +1,6 @@
 import AuthorInput from '@/components/Common/input/AuthorInput';
-import ResourceTags from '@/components/Common/tagFc/ResourceTag';
+import TagInputModal from '@/components/Common/tagInput/TagInputModal';
+import TagList from '@/components/Common/tagInput/TagList';
 import ImageUpload from '@/components/Common/upload/ImageUpload';
 import { fetchResourceList } from '@/services/resource/resource';
 import type { ResourceVo } from '@/types/entity';
@@ -15,7 +16,6 @@ import { connect, useDispatch } from 'umi';
 import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
 import ResourceFormModal from './ResourceFormModal';
-import TagDrawer from './TagDrawer';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -24,7 +24,7 @@ const Resource: React.FC<ResourceProps> = () => {
   const dispatch = useDispatch();
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [tagModalVisible, setTagModalVisible] = useState(false);
   const [resourceId, setResourceId] = useState('');
   const [currentResource, setCurrentResource] = useState<ResourceVo>();
   const [albumVisible, setAlbumVisible] = useState(false);
@@ -50,33 +50,21 @@ const Resource: React.FC<ResourceProps> = () => {
   const onTagClick = (entity: ResourceVo) => {
     setResourceId(entity.id);
     setCurrentResource(entity);
-    setDrawerVisible(true);
+    setTagModalVisible(true);
   };
 
-  const onTagDrawerClose = () => {
-    setDrawerVisible(false);
+  const closeTagModal = () => {
+    setTagModalVisible(false);
     actionRef.current?.reload();
   };
 
   const renderTag = (_dom: any, entity: ResourceVo) => {
     // todo 1+n查询方案优化
+    const valueList: string[] = entity.tagReferenceVoList.map((t) => t.tagVo.name);
     return (
-      <Tooltip
-        title={
-          <ResourceTags
-            showMoreMessage
-            resourceId={entity.id}
-            tagList={entity.tagReferenceVoList}
-            totalCount={entity.tagCount}
-          />
-        }
-      >
+      <Tooltip title={<TagList valueList={valueList} />}>
         <div>
-          <ResourceTags
-            totalCount={entity.tagCount}
-            resourceId={entity.id}
-            tagList={entity.tagReferenceVoList}
-          />
+          <TagList valueList={valueList} maxCount={entity.tagCount} />
         </div>
       </Tooltip>
     );
@@ -94,6 +82,10 @@ const Resource: React.FC<ResourceProps> = () => {
   };
 
   const columns: ProColumns<ResourceVo>[] = [
+    {
+      title: 'id',
+      dataIndex: 'id',
+    },
     {
       title: '文件名',
       dataIndex: 'filename',
@@ -298,14 +290,11 @@ const Resource: React.FC<ResourceProps> = () => {
           />,
         ]}
       />
-      {drawerVisible && (
-        <TagDrawer
-          onClose={onTagDrawerClose}
-          visible={drawerVisible}
-          resourceId={resourceId}
-          renderTitle={renderTagDrawerTitle()}
-          key={resourceId}
-          setVisible={setDrawerVisible}
+      {tagModalVisible && (
+        <TagInputModal
+          onOk={closeTagModal}
+          visible={tagModalVisible}
+          resource={currentResource}
         />
       )}
       {modifyVisible && (

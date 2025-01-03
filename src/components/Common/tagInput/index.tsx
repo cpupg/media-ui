@@ -28,10 +28,6 @@ interface PropsType {
    * 标签中的内容。
    */
   valueList?: string[];
-  /**
-   * 当前输入的内容。
-   */
-  value?: string;
 }
 
 /**
@@ -40,7 +36,7 @@ interface PropsType {
  * @returns 标签输入框。
  */
 const TagInput: React.FC<PropsType> = (props) => {
-  const { onEnter, onClose, close, onValueChange, valueList, value } = props;
+  const { onEnter, onClose, close, onValueChange, valueList } = props;
 
   const [tagList, setTagList] = useState<string[]>([]);
   const [current, setCurrent] = useState('');

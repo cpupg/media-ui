@@ -2,6 +2,7 @@ import { Modal } from 'antd';
 import React from 'react';
 import ResourceTag from './ResourceTag';
 import { ResourceVo } from '@/types/entity';
+import { useDispatch } from 'umi';
 
 interface PropsType {
   /**
@@ -22,8 +23,18 @@ interface PropsType {
 const TagInputModal: React.FC<PropsType> = (props) => {
   const { onOk, resource, visible } = props;
 
+  const dispatch = useDispatch();
+
+  const close = () => {
+    onOk();
+    dispatch({
+      type: 'tag/setTagList',
+      payload: [],
+    });
+  };
+
   return (
-    <Modal visible={visible} onCancel={onOk} onOk={onOk} title={resource.filename}>
+    <Modal visible={visible} onCancel={close} onOk={close} title={resource.filename}>
       <ResourceTag search resourceId={resource.id} />
     </Modal>
   );

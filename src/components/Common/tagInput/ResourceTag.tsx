@@ -2,7 +2,7 @@ import TagReferenceVo, { TagVo } from '@/types/entity';
 import { ModelType } from '@/types/model';
 import { useDebounceFn } from 'ahooks';
 import { message, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { connect, useDispatch } from 'umi';
 import TagInput from '.';
 
@@ -33,10 +33,6 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   const { resourceId, tagList, search, searchResult } = props;
 
   const dispatch = useDispatch();
-  // 标签列表，从后台获取，添加新标签后刷新
-  // 当前输入框的标签
-  const [value, setValue] = useState<string>('');
-
   useEffect(() => {
     dispatch({
       type: 'tag/queryResourceList',
@@ -61,7 +57,6 @@ const ResourceTag: React.FC<PropsType> = (props) => {
         },
       });
     });
-    setValue('');
   };
 
   const { run: onSearch } = useDebounceFn(
@@ -77,7 +72,6 @@ const ResourceTag: React.FC<PropsType> = (props) => {
   );
 
   const onChange = (current: string) => {
-    setValue(current);
     if (search && current.length > 0) {
       onSearch(current);
     }
@@ -126,7 +120,6 @@ const ResourceTag: React.FC<PropsType> = (props) => {
         onValueChange={onChange}
         close={true}
         valueList={valueList()}
-        value={value}
       />
       {search && renderSearchResult()}
     </React.Fragment>

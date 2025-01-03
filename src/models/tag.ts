@@ -221,7 +221,7 @@ const model: TagModelType = {
       const data: ResponseData<TagReferenceVo> = yield call(addTagToResource, payload);
       if (parseResponse(data)) {
         yield put({
-          type: 'tag/queryResourceList',
+          type: 'queryResourceList',
           payload: {
             resourceId: payload.resourceId,
           },
