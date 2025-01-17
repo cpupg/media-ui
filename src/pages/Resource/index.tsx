@@ -83,10 +83,6 @@ const Resource: React.FC<ResourceProps> = () => {
 
   const columns: ProColumns<ResourceVo>[] = [
     {
-      title: 'id',
-      dataIndex: 'id',
-    },
-    {
       title: '文件名',
       dataIndex: 'filename',
       width: 200,
