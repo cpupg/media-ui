@@ -91,6 +91,7 @@ const TagInput: React.FC<PropsType> = (props) => {
     <div className="ant-input" style={{ minHeight: 0 }}>
       {renderTag()}
       <Input
+        placeholder='请输入标签'
         onPressEnter={(e) => handleEnter(current)}
         bordered={false}
         // style={{ width: 50 }}

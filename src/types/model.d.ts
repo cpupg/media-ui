@@ -9,6 +9,7 @@ import type {
   SelectAuthorStateType,
   SiteStateType,
   TagStateType,
+  RateStateType
 } from 'umi';
 
 /**
@@ -29,4 +30,5 @@ export interface ModelType {
   site: SiteStateType;
   tag: TagStateType;
   album: AlbumModelState;
+  rate: RateStateType;
 }

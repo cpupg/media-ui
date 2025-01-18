@@ -374,3 +374,40 @@ export interface FileInfo {
    */
   filename?: string;
 }
+
+/**
+ * 评分。
+ */
+export interface RateVo {
+  serialVersionUID?: number
+
+  /**
+  * 评分主键标识。
+  */
+  rateId?: string
+
+  /**
+  * 资源标识
+  */
+  resourceId?: string
+
+  /**
+  * 评分
+  */
+  rate?: number
+
+  /**
+  * 删除状态
+  */
+  deleteStatus?: number
+
+  /**
+  * 创建时间
+  */
+  createTime?: any
+
+  /**
+  * 更新时间
+  */
+  updateTime?: any
+}

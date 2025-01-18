@@ -15,6 +15,7 @@ import React, { useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
+import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
 interface ResourceProps {
   resourceList: ResourceVo[];
@@ -124,8 +125,8 @@ const Resource: React.FC<ResourceProps> = () => {
       hideInSearch: true,
       hideInForm: true,
       width: 50,
-      render: (_, entity) => {
-        return entity.rate > -1 ? entity.rate : '';
+      render: (_, data) => {
+        return <RateModal reload={reload} resource={data} />;
       },
     },
     {
@@ -287,11 +288,7 @@ const Resource: React.FC<ResourceProps> = () => {
         ]}
       />
       {tagModalVisible && (
-        <TagInputModal
-          onOk={closeTagModal}
-          visible={tagModalVisible}
-          resource={currentResource}
-        />
+        <TagInputModal onOk={closeTagModal} visible={tagModalVisible} resource={currentResource} />
       )}
       {modifyVisible && (
         <ResourceFormModal
