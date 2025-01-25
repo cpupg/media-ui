@@ -37,23 +37,45 @@ const Collect: React.FC<PropsType> = (props) => {
   const [current, setCurrent] = useState(1);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
+  const search = () => {
     dispatch({
       type: 'collect/queryResourceCollect',
       payload: {
         params: {
           resourceId: resource.id,
           current: 1,
-          pageSize: 5,
+          pageSize: 10,
         },
       },
     });
+  };
+
+  useEffect(() => {
+    search();
   }, [dispatch]);
 
   const columns: ColumnsType<ResourceCollectVo> = [
     {
       title: '收藏夹',
       dataIndex: 'collectName',
+    },
+    {
+      width: 50,
+      render: (_, record) => (
+        <Button
+          onClick={() => {
+            dispatch({
+              type: 'collect/cancelCollect',
+              payload: {
+                resourceCollectId: record.resourceCollectId,
+              },
+            });
+            search();
+          }}
+        >
+          取消收藏
+        </Button>
+      ),
     },
   ];
 
@@ -83,14 +105,17 @@ const Collect: React.FC<PropsType> = (props) => {
         onCancel={onOK}
         visible={visible}
         footer={[
-          <Button onClick={() => setShowModal(true)}>添加到收藏夹</Button>,
-          <Button type="primary" onClick={onOK}>
+          <Button key={1} onClick={() => setShowModal(true)}>
+            添加到收藏夹
+          </Button>,
+          <Button key={2} type="primary" onClick={onOK}>
             确定
           </Button>,
         ]}
       >
         <Table
           size="small"
+          key="collectId"
           dataSource={resourceCollectList?.data}
           columns={columns}
           pagination={pagination}
@@ -99,6 +124,7 @@ const Collect: React.FC<PropsType> = (props) => {
       {showModal && (
         <CollectSelectModal
           resource={resource}
+          onRefresh={search}
           visible={showModal}
           onOk={() => setShowModal(false)}
         />

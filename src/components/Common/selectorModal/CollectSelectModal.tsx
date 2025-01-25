@@ -2,6 +2,7 @@ import { CollectVo, ResourceVo } from '@/types/entity';
 import { ModelType } from '@/types/model';
 import { TableResponse } from '@/types/response/table';
 import { Button, Col, Input, message, Modal, Row, Table, TablePaginationConfig } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
 import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 
@@ -22,15 +23,27 @@ interface PropsType {
    * 收藏夹。
    */
   collectList?: TableResponse<CollectVo>;
+  /**
+   * 刷新表格。
+   */
+  onRefresh: () => void;
 }
 
 const CollectResourceModal: React.FC<PropsType> = (props) => {
-  const { resource, onOk, visible, collectList } = props;
+  const { resource, onOk, visible, collectList, onRefresh } = props;
   const dispatch = useDispatch();
 
   const [current, setCurrent] = useState(1);
   const [name, setName] = useState('');
   const [showSearch, setShowSearch] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+
+  const onClose = () => {
+    onOk();
+    if (refresh) {
+      onRefresh();
+    }
+  };
 
   const search = () => {
     dispatch({
@@ -90,13 +103,20 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
             collectId: data.collectId,
           },
         });
+        setRefresh(true);
       },
-      style: { backgroundColor: 'green' },
     };
   };
 
+  const columns: ColumnsType<CollectVo> = [
+    {
+      title: '名称',
+      dataIndex: 'collectName',
+    },
+  ];
+
   return (
-    <Modal title="选择收藏夹" onOk={onOk} onCancel={onOk} visible={visible}>
+    <Modal title="选择收藏夹" onOk={onOk} onCancel={onClose} visible={visible}>
       <Row>
         <Col span={18}>
           <Input
@@ -117,7 +137,13 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
           )}
         </Col>
       </Row>
-      <Table onRow={onRow} dataSource={collectList?.data} pagination={pagination} />
+      <Table
+        onRow={onRow}
+        dataSource={collectList?.data}
+        pagination={pagination}
+        columns={columns}
+        size="small"
+      />
     </Modal>
   );
 };
