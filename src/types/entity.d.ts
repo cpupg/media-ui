@@ -1,3 +1,5 @@
+import { TablePagination } from "./request/table";
+
 /**
  * 占位符，用来标记实体类型。
  */
@@ -126,6 +128,23 @@ export interface ResourceVo extends E {
    * 和资源关联的专辑id，只在ResourceSelectModal中使用。
    */
   albumId: string;
+  /**
+   * 新增加的专辑。
+   */
+  addedAlbums?: AlbumVo[];
+  /**
+   * 新增的标签。
+   */
+  addedTags?: TagVo[];
+  /**
+   * 删除的专辑。
+   */
+  deletedAlbums?: AlbumVo[];
+  /**
+   * 删除的标签。
+   */
+  deletedTags?: TagVo[];
+
 }
 
 export interface ResourceTypeMapVo extends E {
@@ -410,4 +429,84 @@ export interface RateVo {
   * 更新时间
   */
   updateTime?: any
+}
+
+/**
+ * 收藏夹。
+ */
+export interface CollectVo extends TablePagination {
+  /**
+  * 主键id。
+  */
+  collectId: string
+
+  /**
+  * 收藏名称
+  */
+  collectName: string
+
+  /**
+  * 删除状态
+  */
+  deleteStatus?: number
+
+  /**
+  * 创建时间
+  */
+  createTime?: string
+
+  /**
+  * 更新时间
+  */
+  updateTime?: string
+
+  /**
+  * 删除时间
+  */
+  deleteTime?: string
+}
+
+/**
+ * 资源和收藏夹之间的关联。
+ */
+export interface ResourceCollectVo extends TablePagination {
+  /**
+  * 资源和收藏的关联id。
+  */
+  resourceCollectId: string
+
+  /**
+  * 资源主键id
+  */
+  resourceId: string
+
+  /**
+  * 收藏id
+  */
+  collectId: string
+
+  /**
+  * 收藏夹名称。
+  */
+  collectName?: string
+
+  /**
+  * 删除状态
+  */
+  deleteStatus?: number
+
+  /**
+  * 创建时间
+  */
+  createTime?: string
+
+  /**
+  * 更新时间。
+  */
+  updateTime?: string
+
+  /**
+  * 删除时间。
+  */
+  deleteTime?: string
 }

@@ -17,6 +17,7 @@ import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
 import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
+import Collect from '@/components/Common/Collect';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -35,6 +36,7 @@ const Resource: React.FC<ResourceProps> = () => {
   const [resToModify, setResToModify] = useState<ResourceVo>();
   const [showPreview, setShowPreview] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>();
+  const [showCollect, setShowCollect] = useState(false);
 
   const reload = () => {
     actionRef.current?.reload();
@@ -130,16 +132,6 @@ const Resource: React.FC<ResourceProps> = () => {
       },
     },
     {
-      title: '收藏',
-      dataIndex: 'favorite',
-      hideInSearch: true,
-      hideInForm: true,
-      width: 50,
-      render: (_, entity) => {
-        return entity.favorite ? '❤️' : ' ';
-      },
-    },
-    {
       title: '创建时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
@@ -156,7 +148,7 @@ const Resource: React.FC<ResourceProps> = () => {
     {
       title: '操作',
       hideInSearch: true,
-      width: 255,
+      width: 300,
       render: (_, entity: ResourceVo) => {
         return (
           <>
@@ -201,19 +193,21 @@ const Resource: React.FC<ResourceProps> = () => {
             >
               预览
             </Button>
+            <Button
+              size="small"
+              onClick={() => {
+                setResourceId(entity.id);
+                setCurrentResource(entity);
+                setShowCollect(true);
+              }}
+            >
+              收藏
+            </Button>
           </>
         );
       },
     },
   ];
-
-  // request={async (params, sorter, filter) =>
-  //   fetchResourceList({ params, sorter, filter })
-  // }
-
-  const renderTagDrawerTitle = () => {
-    return <span>当前文件：{`${currentResource?.dir}${currentResource?.filename}`}</span>;
-  };
 
   const closeImageUpload = () => {
     setShowPreview(false);
@@ -322,6 +316,15 @@ const Resource: React.FC<ResourceProps> = () => {
         >
           <ImageUpload businessCode={resourceId} businessType={4} />
         </Modal>
+      )}
+      {showCollect && (
+        <Collect
+          visible={showCollect}
+          resource={currentResource}
+          onOK={() => {
+            setShowCollect(false);
+          }}
+        />
       )}
     </div>
   );

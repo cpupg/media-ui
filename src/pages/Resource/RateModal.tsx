@@ -46,8 +46,8 @@ const RateModal: React.FC<PropsType> = (props) => {
     if (resource.rate) {
       return <div>{resource.rate}</div>;
     } else {
-      // 使用空白，让没有评分的单元格可以点击
-      return <div>&nbsp;&nbsp;</div>;
+      // 使用空白，让没有评分的单元格可以点击，使用横线用来标识可以点击的区域
+      return <div>-&nbsp;</div>;
     }
   };
 
