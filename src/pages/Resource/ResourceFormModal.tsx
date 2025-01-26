@@ -1,12 +1,11 @@
 import AuthorSelectorModal from '@/components/Common/selectorModal/AuthorSelectorModal';
-import ImageUpload from '@/components/Common/upload/ImageUpload';
 import type { AuthorVo, ResourceVo } from '@/types/entity';
 import { ModalForm, ProFormText } from '@ant-design/pro-form';
 import { Button, Form } from 'antd';
 import React, { useState } from 'react';
 import { useDispatch } from 'umi';
 
-interface ModalType {
+interface PropsType {
   /**
    * 刷新父组件。
    */
@@ -53,7 +52,7 @@ interface FormType {
   albumName?: string;
 }
 
-const ResourceFormModal: React.FC<ModalType> = (props: ModalType) => {
+const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
   const { reload, data, visible, onCancel } = props;
 
   const [authorVisible, setAuthorVisible] = useState(false);
@@ -90,8 +89,8 @@ const ResourceFormModal: React.FC<ModalType> = (props: ModalType) => {
   return (
     <ModalForm
       onFinish={onFinish}
-      title="添加资源"
-      trigger={<Button type='primary'>新建</Button>}
+      title={data ? `修改资源【${data.filename}】` : '添加资源'}
+      trigger={<Button type="primary">新建</Button>}
       modalProps={{ onCancel: onCancel }}
       visible={visible}
       form={form}
@@ -119,7 +118,6 @@ const ResourceFormModal: React.FC<ModalType> = (props: ModalType) => {
       <ProFormText
         fieldProps={{
           onClick: () => setAuthorVisible(true),
-          onFocus: () => setAuthorVisible(true),
         }}
         label="作者姓名"
         name="authorName"

@@ -1,15 +1,13 @@
-import SiteSelectorModal from '@/components/Common/selectorModal/SiteSelectorModal';
 import type { AuthorStateType } from '@/models/author';
-import type { AuthorVo, SiteVo } from '@/types/entity';
 import { queryList } from '@/services/author';
+import type { AuthorVo, SiteVo } from '@/types/entity';
+import type { ModelType } from '@/types/model';
 import type { ProFormInstance } from '@ant-design/pro-form';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { Button, Input, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import AuthorModal from './AuthorModal';
-import type { ModelType } from '@/types/model';
 
 const Author: React.FC<AuthorStateType> = () => {
   const [authorModalVisible, setAuthorModalVisible] = useState(false);
@@ -115,6 +113,7 @@ const Author: React.FC<AuthorStateType> = () => {
     <div>
       <ProTable<AuthorVo>
         formRef={formRef}
+        pagination={{ showQuickJumper: true }}
         actionRef={actionRef}
         defaultSize="small"
         columns={columns}

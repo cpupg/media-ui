@@ -1,5 +1,6 @@
 import AuthorInput from '@/components/Common/input/AuthorInput';
-import ResourceTags from '@/components/Common/tagFc/ResourceTag';
+import TagInputModal from '@/components/Common/tagInput/TagInputModal';
+import TagList from '@/components/Common/tagInput/TagList';
 import ImageUpload from '@/components/Common/upload/ImageUpload';
 import { fetchResourceList } from '@/services/resource/resource';
 import type { ResourceVo } from '@/types/entity';
@@ -13,8 +14,10 @@ import copy from 'copy-to-clipboard';
 import React, { useRef, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import Album from './Album';
+import BatchUpdateFormModal from './BatchUpdateFormModal';
+import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
-import TagDrawer from './TagDrawer';
+import Collect from '@/components/Common/Collect';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -23,7 +26,7 @@ const Resource: React.FC<ResourceProps> = () => {
   const dispatch = useDispatch();
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [tagModalVisible, setTagModalVisible] = useState(false);
   const [resourceId, setResourceId] = useState('');
   const [currentResource, setCurrentResource] = useState<ResourceVo>();
   const [albumVisible, setAlbumVisible] = useState(false);
@@ -33,6 +36,7 @@ const Resource: React.FC<ResourceProps> = () => {
   const [resToModify, setResToModify] = useState<ResourceVo>();
   const [showPreview, setShowPreview] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>();
+  const [showCollect, setShowCollect] = useState(false);
 
   const reload = () => {
     actionRef.current?.reload();
@@ -49,33 +53,21 @@ const Resource: React.FC<ResourceProps> = () => {
   const onTagClick = (entity: ResourceVo) => {
     setResourceId(entity.id);
     setCurrentResource(entity);
-    setDrawerVisible(true);
+    setTagModalVisible(true);
   };
 
-  const onTagDrawerClose = () => {
-    setDrawerVisible(false);
+  const closeTagModal = () => {
+    setTagModalVisible(false);
     actionRef.current?.reload();
   };
 
   const renderTag = (_dom: any, entity: ResourceVo) => {
     // todo 1+n查询方案优化
+    const valueList: string[] = entity.tagReferenceVoList.map((t) => t.tagVo.name);
     return (
-      <Tooltip
-        title={
-          <ResourceTags
-            showMoreMessage
-            resourceId={entity.id}
-            tagList={entity.tagReferenceVoList}
-            totalCount={entity.tagCount}
-          />
-        }
-      >
+      <Tooltip title={<TagList valueList={valueList} />}>
         <div>
-          <ResourceTags
-            totalCount={entity.tagCount}
-            resourceId={entity.id}
-            tagList={entity.tagReferenceVoList}
-          />
+          <TagList valueList={valueList} maxCount={entity.tagCount} />
         </div>
       </Tooltip>
     );
@@ -119,12 +111,6 @@ const Resource: React.FC<ResourceProps> = () => {
       },
       width: 100,
     },
-    // {
-    //   title: '专辑',
-    //   hideInSearch: true,
-    //   dataIndex: ['albumVo', 'albumName'],
-    //   width: 150,
-    // },
     {
       title: '标签',
       dataIndex: 'tags',
@@ -141,18 +127,8 @@ const Resource: React.FC<ResourceProps> = () => {
       hideInSearch: true,
       hideInForm: true,
       width: 50,
-      render: (_, entity) => {
-        return entity.rate > -1 ? entity.rate : '';
-      },
-    },
-    {
-      title: '收藏',
-      dataIndex: 'favorite',
-      hideInSearch: true,
-      hideInForm: true,
-      width: 50,
-      render: (_, entity) => {
-        return entity.favorite ? '❤️' : ' ';
+      render: (_, data) => {
+        return <RateModal reload={reload} resource={data} />;
       },
     },
     {
@@ -172,7 +148,7 @@ const Resource: React.FC<ResourceProps> = () => {
     {
       title: '操作',
       hideInSearch: true,
-      width: 255,
+      width: 300,
       render: (_, entity: ResourceVo) => {
         return (
           <>
@@ -217,19 +193,21 @@ const Resource: React.FC<ResourceProps> = () => {
             >
               预览
             </Button>
+            <Button
+              size="small"
+              onClick={() => {
+                setResourceId(entity.id);
+                setCurrentResource(entity);
+                setShowCollect(true);
+              }}
+            >
+              收藏
+            </Button>
           </>
         );
       },
     },
   ];
-
-  // request={async (params, sorter, filter) =>
-  //   fetchResourceList({ params, sorter, filter })
-  // }
-
-  const renderTagDrawerTitle = () => {
-    return <span>当前文件：{`${currentResource?.dir}${currentResource?.filename}`}</span>;
-  };
 
   const closeImageUpload = () => {
     setShowPreview(false);
@@ -263,6 +241,7 @@ const Resource: React.FC<ResourceProps> = () => {
     <div>
       <ProTable<ResourceVo>
         rowKey="id"
+        pagination={{ showQuickJumper: true }}
         onLoad={() => setSelectedRowKeys([])}
         rowSelection={rowSelection}
         actionRef={actionRef}
@@ -292,20 +271,18 @@ const Resource: React.FC<ResourceProps> = () => {
         }}
         toolBarRender={() => [
           <ResourceFormModal key={1} reload={reload} />,
-          <Button onClick={batchDelete} key={2}>
-            批量删除
-          </Button>,
+          <Popconfirm key={2} title="批量删除" onConfirm={batchDelete}>
+            <Button>批量删除</Button>
+          </Popconfirm>,
+          <BatchUpdateFormModal
+            key={3}
+            condition={{ params: formRef.current?.getFieldsValue(), idList: selectedRowKeys }}
+            reload={reload}
+          />,
         ]}
       />
-      {drawerVisible && (
-        <TagDrawer
-          onClose={onTagDrawerClose}
-          visible={drawerVisible}
-          resourceId={resourceId}
-          renderTitle={renderTagDrawerTitle()}
-          key={resourceId}
-          setVisible={setDrawerVisible}
-        />
+      {tagModalVisible && (
+        <TagInputModal onOk={closeTagModal} visible={tagModalVisible} resource={currentResource} />
       )}
       {modifyVisible && (
         <ResourceFormModal
@@ -339,6 +316,15 @@ const Resource: React.FC<ResourceProps> = () => {
         >
           <ImageUpload businessCode={resourceId} businessType={4} />
         </Modal>
+      )}
+      {showCollect && (
+        <Collect
+          visible={showCollect}
+          resource={currentResource}
+          onOK={() => {
+            setShowCollect(false);
+          }}
+        />
       )}
     </div>
   );

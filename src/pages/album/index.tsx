@@ -110,6 +110,7 @@ const Album: React.FC<PropsType> = () => {
     <>
       <ProTable<AlbumVo>
         columns={columns}
+        pagination={{ showQuickJumper: true }}
         rowKey="id"
         defaultSize="small"
         actionRef={actionRef}
