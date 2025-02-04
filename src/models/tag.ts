@@ -1,4 +1,11 @@
-import { addTag, queryTagList, queryTagReferenceList } from '@/services/tag';
+import {
+  addTag,
+  addTagToResource,
+  queryResourceList,
+  queryList,
+  queryTagReferenceList,
+  removeTagFromResource,
+} from '@/services/tag';
 import { parseResponse, parseTableResponse } from '@/utils/utils';
 import type { Effect, Reducer } from 'umi';
 import type TagReferenceVo from '../types/entity';
@@ -11,7 +18,7 @@ import { StatusCode } from '../types/response/enum';
 
 export interface TagStateType {
   /**
-   * tag表查到的标签。
+   * tag表模糊查询结果。
    */
   tagList: TagVo[];
   /**
@@ -30,6 +37,10 @@ export interface TagStateType {
    * 当前资源的收藏。
    */
   currentFavorite: TagReferenceVo | null;
+  /**
+   * 当前资源下的标签。
+   */
+  tagReferenceVoList: TagReferenceVo[];
 }
 
 export interface TagModelType {
@@ -39,7 +50,7 @@ export interface TagModelType {
     /**
      * 查询标签列表，tag表。
      */
-    queryTagList: Effect;
+    queryList: Effect;
     /**
      * 查询用来打分的标签列表，tag表里name=0-10。
      */
@@ -64,13 +75,26 @@ export interface TagModelType {
      * 查询当前资源是否被收藏，tag_reference表resource_id=当前资源且name=收藏。
      */
     queryCurrentFavorite: Effect;
+    /**
+     * 根据资源标识查询资源的标签.
+     */
+    queryResourceList: Effect;
+    /**
+     * 删除资源拥有的标签。
+     */
+    removeTagFromResource: Effect;
+    /**
+     * 给资源添加标签。
+     */
+    addTagToResource: Effect;
   };
   reducers: {
-    setTagList: Reducer<TagStateType>;
-    setRateTagList: Reducer<TagStateType>;
-    setFavoriteTagList: Reducer<TagStateType>;
-    setCurrentRate: Reducer<TagReferenceVo>;
-    setCurrentFavorite: Reducer<TagReferenceVo>;
+    setTagList: Reducer;
+    setRateTagList: Reducer;
+    setFavoriteTagList: Reducer;
+    setCurrentRate: Reducer;
+    setCurrentFavorite: Reducer;
+    setTagReferenceVoList: Reducer;
   };
 }
 
@@ -82,10 +106,11 @@ const model: TagModelType = {
     rateTagList: [],
     currentRate: null,
     currentFavorite: null,
+    tagReferenceVoList: [],
   },
   effects: {
-    *queryTagList({ payload }, { call, put }) {
-      const data: TableResponse<TagVo> = yield call(queryTagList, payload);
+    *queryList({ payload }, { call, put }) {
+      const data: TableResponse<TagVo> = yield call(queryList, payload);
       if (parseTableResponse(data)) {
         yield put({
           type: 'setTagList',
@@ -94,7 +119,7 @@ const model: TagModelType = {
       }
     },
     *queryRateTagList({ payload }, { call, put }) {
-      const data: TableResponse<TagVo> = yield call(queryTagList, payload);
+      const data: TableResponse<TagVo> = yield call(queryList, payload);
       if (parseTableResponse(data)) {
         yield put({
           type: 'setRateTagList',
@@ -103,7 +128,7 @@ const model: TagModelType = {
       }
     },
     *queryFavoriteTag({ payload }, { call, put }) {
-      const data: TableResponse<TagVo> = yield call(queryTagList, payload);
+      const data: TableResponse<TagVo> = yield call(queryList, payload);
       if (parseTableResponse(data)) {
         yield put({
           type: 'setFavoriteTagList',
@@ -177,6 +202,32 @@ const model: TagModelType = {
         });
       }
     },
+    *queryResourceList({ payload }, { call, put }) {
+      const data: ResponseData<TagReferenceVo[]> = yield call(queryResourceList, payload);
+      if (parseResponse(data)) {
+        yield put({
+          type: 'setTagReferenceVoList',
+          payload: data.data,
+        });
+      }
+    },
+    *removeTagFromResource({ payload }, { call, put }) {
+      const data: ResponseData<TagReferenceVo> = yield call(removeTagFromResource, payload);
+      if (parseResponse(data)) {
+        message.success('删除成功');
+      }
+    },
+    *addTagToResource({ payload }, { call, put }) {
+      const data: ResponseData<TagReferenceVo> = yield call(addTagToResource, payload);
+      if (parseResponse(data)) {
+        yield put({
+          type: 'queryResourceList',
+          payload: {
+            resourceId: payload.resourceId,
+          },
+        });
+      }
+    },
   },
   reducers: {
     setTagList(state, { payload }) {
@@ -207,6 +258,12 @@ const model: TagModelType = {
       return {
         ...state,
         currentFavorite: payload,
+      };
+    },
+    setTagReferenceVoList(state, { payload }) {
+      return {
+        ...state,
+        tagReferenceVoList: payload,
       };
     },
   },

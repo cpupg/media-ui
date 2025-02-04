@@ -7,13 +7,33 @@ import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 
 interface PropsType {
+  /**
+   * 资源标识。
+   */
   resourceId: string;
+  /**
+   * 资源名。
+   */
   resourceName: string;
+  /**
+   * 可见性。
+   */
   visible: boolean;
+  /**
+   * 取消按钮回调。
+   */
   onCancel: () => void;
+  /**
+   * 可选专辑列表，由组件自己处理，通过umi注入。
+   */
   albumTableResponse: TableResponse<AlbumResourceVo>;
 }
 
+/**
+ * 显示当前资源的专辑。
+ * @param props 属性。
+ * @returns 包含当前资源的专辑。
+ */
 const Album: React.FC<PropsType> = (props: PropsType) => {
   const { resourceId, albumTableResponse, visible, onCancel, resourceName } = props;
   const [current, setCurrent] = useState(1);
@@ -21,7 +41,7 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
   const [showAlbumSelect, setShowAlbumSelect] = useState(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const query = () => {
     dispatch({
       type: 'resource/queryAlbumList',
       payload: {
@@ -32,6 +52,10 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
         },
       },
     });
+  };
+
+  useEffect(() => {
+    query();
   }, [dispatch]);
 
   const onPaginationChange = (page: number, pageSize: number) => {
@@ -95,16 +119,7 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
 
   const closeAlbumSelectModal = () => {
     setShowAlbumSelect(false);
-    dispatch({
-      type: 'resource/queryAlbumList',
-      payload: {
-        params: {
-          resourceId: resourceId,
-          pageSize,
-          current,
-        },
-      },
-    });
+    query();
   };
 
   return (
@@ -139,6 +154,7 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
           resourceId={resourceId}
           visible={showAlbumSelect}
           onCancel={closeAlbumSelectModal}
+          queryWithResource={true}
           onSelect={onSelect}
         />
       )}

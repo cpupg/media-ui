@@ -7,17 +7,63 @@ import { connect, useDispatch } from 'umi';
 import './style.less';
 
 interface PropsType {
-  albumList: AlbumVo[];
-  onSelect: (data: AlbumVo) => void;
+  /**
+   * 专辑列表，由umi注入。
+   */
+  albumList?: AlbumVo[];
+  /**
+   * 专辑总数，由umi注入。
+   */
   total: number;
+  /**
+   * 点击专辑的回调。
+   * @param data 当前选择的专辑。
+   * @returns none
+   */
+  onSelect: (data: AlbumVo) => void;
+  /**
+   * 资源标识。
+   */
   resourceId: string;
+  /**
+   * 可见性。
+   */
   visible: boolean;
+  /**
+   * 点击取消的回调。
+   * @returns void
+   */
   onCancel: () => void;
-  resourceName: string;
+  /**
+   * 资源名。
+   */
+  resourceName?: string;
+  /**
+   * 查询专辑时是否关联资源，默认false。
+   */
+  queryWithResource?: boolean;
+  /**
+   * 弹框标题，如果有次属性则覆盖`为【${resourceName}】选择专辑`。
+   */
+  title?: string;
 }
-
+/**
+ * 传入资源名和资源标识，然后选择专辑。已包含当前资源的专辑会高亮。
+ * @param props 专辑选择弹框。
+ * @returns 专辑弹框。
+ */
 const AlbumSelectModal: React.FC<PropsType> = (props) => {
-  const { albumList, total, visible, onCancel, resourceName, onSelect, resourceId } = props;
+  const {
+    albumList,
+    total,
+    visible,
+    onCancel,
+    resourceName,
+    onSelect,
+    resourceId,
+    queryWithResource,
+    title,
+  } = props;
   const dispatch = useDispatch();
   const [current, setCurrent] = useState(1);
 
@@ -28,7 +74,7 @@ const AlbumSelectModal: React.FC<PropsType> = (props) => {
         params: {
           current: current,
           pageSize: 10,
-          selectModal: true,
+          queryWithResource,
           resourceId,
         },
       },
@@ -63,7 +109,7 @@ const AlbumSelectModal: React.FC<PropsType> = (props) => {
         params: {
           current: page,
           pageSize: 10,
-          selectModal: true,
+          queryWithResource,
           resourceId,
         },
       },
@@ -77,7 +123,7 @@ const AlbumSelectModal: React.FC<PropsType> = (props) => {
         params: {
           current: current,
           pageSize: 10,
-          selectModal: true,
+          queryWithResource,
           albumName: value,
           resourceId,
         },
@@ -90,7 +136,7 @@ const AlbumSelectModal: React.FC<PropsType> = (props) => {
       visible={visible}
       onCancel={onCancel}
       onOk={onCancel}
-      title={`为【${resourceName}】选择专辑`}
+      title={title ?? `为【${resourceName}】选择专辑`}
     >
       <Input.Search onSearch={onSearch} />
       <Table

@@ -83,19 +83,20 @@ const Site: React.FC<SiteStateType> = (props) => {
     <div>
       <ProTable<SiteVo>
         actionRef={actionRef}
+        pagination={{ showQuickJumper: true }}
         rowKey="id"
         defaultSize="small"
         columns={columns}
         request={async (params, sorter, filter) => querySiteList({ params, sorter, filter })}
-        toolBarRender={() => (
-          <Button
+        toolBarRender={() => [(
+          <Button key="1"
             onClick={() => {
               setNewSiteModalVisible(true);
             }}
           >
             新建
           </Button>
-        )}
+        )]}
       />
       {newSiteModalVisible && (
         <NewSiteModal reload={reload} handleCancel={handleCancel} visible={newSiteModalVisible} />

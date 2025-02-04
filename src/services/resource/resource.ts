@@ -77,3 +77,17 @@ export async function unsetAlbum(payload: { albumResourceId: string }) {
     requestType: 'form',
   });
 }
+
+export async function batchDelete(payload: { albumResourceId: string }) {
+  return request('/api/resource/batchDelete', {
+    data: payload,
+    method: 'POST',
+  });
+}
+
+export async function batchUpdate(payload: { albumResourceId: string }) {
+  return request('/api/resource/batchUpdate', {
+    data: payload,
+    method: 'POST',
+  });
+}

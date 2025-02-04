@@ -17,7 +17,7 @@ const ImageUpload: React.FC<PropsType> = (props) => {
   const { businessCode, businessType, currentFileList } = props;
   const [fileList, setFileList] = useState<UploadFile[]>();
   const [showPreview, setShowPreview] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
+  const [previewImage, setPreviewImage] = useState<string>();
   const [previewTitle, setPreviewTitle] = useState('');
   const dispatch = useDispatch();
 
@@ -51,7 +51,7 @@ const ImageUpload: React.FC<PropsType> = (props) => {
             url: `/api/file/getFile?id=${f.response.data.id}`,
           };
         } else {
-          message.success('上传失败');
+          message.error('上传失败');
         }
       }
       return f;
@@ -74,7 +74,6 @@ const ImageUpload: React.FC<PropsType> = (props) => {
           message.success('删除成功');
         } else {
           message.error('删除失败:' + v.message);
-          return false;
         }
       })
       .catch((e) => {
@@ -82,8 +81,18 @@ const ImageUpload: React.FC<PropsType> = (props) => {
       });
   };
 
+  const refresh = () => {
+    dispatch({
+      type: 'upload/imageUpload/queryFileList',
+      payload: {
+        businessCode,
+      },
+    });
+  }
+
   return (
     <>
+      <Button style={{marginBottom: 10}} size='small' onClick={refresh}>刷新</Button>
       <Upload
         listType="picture-card"
         data={{ businessCode, businessType }}
@@ -93,6 +102,7 @@ const ImageUpload: React.FC<PropsType> = (props) => {
         onChange={handleFileChange}
         onPreview={handlePreview}
         onRemove={onRemove}
+        multiple={true}
         // todo 开启后可以选多个但是一个文件会上传多次
         // multiple
       >

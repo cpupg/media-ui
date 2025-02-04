@@ -8,7 +8,7 @@ export interface ResourceSelectModalStateType {
   response?: TableResponse<ResourceVo>;
 }
 
-export interface ModelType {
+export interface ResourceSelectModalModelType {
   namespace: 'selectModal/resource';
   state: ResourceSelectModalStateType;
   effects: {
@@ -19,7 +19,7 @@ export interface ModelType {
   };
 }
 
-const model: ModelType = {
+const model: ResourceSelectModalModelType = {
   namespace: 'selectModal/resource',
   state: {},
   effects: {

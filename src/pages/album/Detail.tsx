@@ -1,8 +1,9 @@
 import ResourceSelectModal from '@/components/Common/selectorModal/ResourceSelectModal';
 import { AlbumResourceVo, ResourceVo } from '@/types/entity';
 import { ModelType } from '@/types/model';
-import { Button, Modal, Table, TablePaginationConfig } from 'antd';
+import { Button, message, Modal, Table, TablePaginationConfig } from 'antd';
 import { ColumnType } from 'antd/lib/table';
+import copy from 'copy-to-clipboard';
 import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
 
@@ -55,6 +56,17 @@ const Detail: React.FC<PropsType> = (props) => {
     },
   };
 
+  const copyAbsolutePath = (data: AlbumResourceVo) => {
+    const path = data.resourceDir + data.resourceName;
+    const success = copy(path.replaceAll('/', '\\'));
+    if (success) {
+      message.success('全路径复制成功');
+    } else {
+      // 显示失败消息影响用户体验
+      console.log('全路径复制失败');
+    }
+  };
+
   const columns: ColumnType<AlbumResourceVo>[] = [
     {
       title: '文件名',
@@ -68,24 +80,29 @@ const Detail: React.FC<PropsType> = (props) => {
     },
     {
       title: '操作',
-      width: 60,
+      width: 120,
       render: (_, data) => (
-        <Button
-          size="small"
-          type="primary"
-          danger
-          onClick={() => {
-            dispatch({
-              type: 'resource/unsetAlbum',
-              payload: {
-                albumResourceId: data.id,
-                albumId: data.albumId,
-              },
-            });
-          }}
-        >
-          删除
-        </Button>
+        <>
+          <Button
+            size="small"
+            type="primary"
+            danger
+            onClick={() => {
+              dispatch({
+                type: 'resource/unsetAlbum',
+                payload: {
+                  albumResourceId: data.id,
+                  albumId: data.albumId,
+                },
+              });
+            }}
+          >
+            删除
+          </Button>
+          <Button size="small" onClick={() => copyAbsolutePath(data)}>
+            复制
+          </Button>
+        </>
       ),
     },
   ];
