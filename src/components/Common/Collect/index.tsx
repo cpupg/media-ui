@@ -100,6 +100,7 @@ const Collect: React.FC<PropsType> = (props) => {
   return (
     <React.Fragment>
       <Modal
+        key={1}
         title="添加到收藏夹"
         onOk={onOK}
         onCancel={onOK}
@@ -115,7 +116,7 @@ const Collect: React.FC<PropsType> = (props) => {
       >
         <Table
           size="small"
-          key="collectId"
+          rowKey="collectId"
           dataSource={resourceCollectList?.data}
           columns={columns}
           pagination={pagination}
@@ -123,6 +124,7 @@ const Collect: React.FC<PropsType> = (props) => {
       </Modal>
       {showModal && (
         <CollectSelectModal
+          key={2}
           resource={resource}
           onRefresh={search}
           visible={showModal}

@@ -29,7 +29,7 @@ interface PropsType {
   onRefresh: () => void;
 }
 
-const CollectResourceModal: React.FC<PropsType> = (props) => {
+const CollectSelectModal: React.FC<PropsType> = (props) => {
   const { resource, onOk, visible, collectList, onRefresh } = props;
   const dispatch = useDispatch();
 
@@ -150,4 +150,4 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
 
 export default connect(({ collect: { collectList } }: ModelType) => ({
   collectList: collectList,
-}))(CollectResourceModal);
+}))(CollectSelectModal);
