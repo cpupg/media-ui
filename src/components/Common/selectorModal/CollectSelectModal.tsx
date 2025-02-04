@@ -5,6 +5,7 @@ import { Button, Col, Input, message, Modal, Row, Table, TablePaginationConfig }
 import { ColumnsType } from 'antd/lib/table';
 import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
+import './style.less';
 
 interface PropsType {
   /**
@@ -53,6 +54,7 @@ const CollectSelectModal: React.FC<PropsType> = (props) => {
           current: current,
           pageSize: 10,
           collectName: name,
+          resourceId: resource.id
         },
       },
     });
@@ -108,6 +110,13 @@ const CollectSelectModal: React.FC<PropsType> = (props) => {
     };
   };
 
+  const rowClassName = (record: CollectVo) => {
+    if (record.resourceId) {
+      return 'selectRow';
+    }
+    return '';
+  };
+
   const columns: ColumnsType<CollectVo> = [
     {
       title: '名称',
@@ -138,6 +147,8 @@ const CollectSelectModal: React.FC<PropsType> = (props) => {
         </Col>
       </Row>
       <Table
+        rowKey="collectId"
+        rowClassName={rowClassName}
         onRow={onRow}
         dataSource={collectList?.data}
         pagination={pagination}
