@@ -1,6 +1,7 @@
 import {
   addCollect,
   cancelCollect,
+  create,
   deleteCollect,
   queryCollect,
   queryResourceCollect,
@@ -51,7 +52,7 @@ const CollectModel: CollectModelType = {
       parseResponse(response);
     },
     *create({ payload }, { call, put }) {
-      const response: ResponseData<CollectVo> = yield call(cancelCollect, payload);
+      const response: ResponseData<CollectVo> = yield call(create, payload);
       if (parseResponse(response)) {
         yield put({
           type: 'setCollectList',

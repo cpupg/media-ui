@@ -41,7 +41,7 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
   const [showAlbumSelect, setShowAlbumSelect] = useState(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const query = () => {
     dispatch({
       type: 'resource/queryAlbumList',
       payload: {
@@ -52,6 +52,10 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
         },
       },
     });
+  };
+
+  useEffect(() => {
+    query();
   }, [dispatch]);
 
   const onPaginationChange = (page: number, pageSize: number) => {
@@ -115,16 +119,7 @@ const Album: React.FC<PropsType> = (props: PropsType) => {
 
   const closeAlbumSelectModal = () => {
     setShowAlbumSelect(false);
-    dispatch({
-      type: 'resource/queryAlbumList',
-      payload: {
-        params: {
-          resourceId: resourceId,
-          pageSize,
-          current,
-        },
-      },
-    });
+    query();
   };
 
   return (

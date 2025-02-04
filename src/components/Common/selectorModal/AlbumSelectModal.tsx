@@ -37,11 +37,15 @@ interface PropsType {
   /**
    * 资源名。
    */
-  resourceName: string;
+  resourceName?: string;
   /**
    * 查询专辑时是否关联资源，默认false。
    */
   queryWithResource?: boolean;
+  /**
+   * 弹框标题，如果有次属性则覆盖`为【${resourceName}】选择专辑`。
+   */
+  title?: string;
 }
 /**
  * 传入资源名和资源标识，然后选择专辑。已包含当前资源的专辑会高亮。
@@ -49,7 +53,17 @@ interface PropsType {
  * @returns 专辑弹框。
  */
 const AlbumSelectModal: React.FC<PropsType> = (props) => {
-  const { albumList, total, visible, onCancel, resourceName, onSelect, resourceId, queryWithResource } = props;
+  const {
+    albumList,
+    total,
+    visible,
+    onCancel,
+    resourceName,
+    onSelect,
+    resourceId,
+    queryWithResource,
+    title,
+  } = props;
   const dispatch = useDispatch();
   const [current, setCurrent] = useState(1);
 
@@ -122,7 +136,7 @@ const AlbumSelectModal: React.FC<PropsType> = (props) => {
       visible={visible}
       onCancel={onCancel}
       onOk={onCancel}
-      title={`为【${resourceName}】选择专辑`}
+      title={title ?? `为【${resourceName}】选择专辑`}
     >
       <Input.Search onSearch={onSearch} />
       <Table

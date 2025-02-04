@@ -5,6 +5,7 @@ import { Button, Col, Input, message, Modal, Row, Table, TablePaginationConfig }
 import { ColumnsType } from 'antd/lib/table';
 import React, { useEffect, useState } from 'react';
 import { connect, useDispatch } from 'umi';
+import './style.less';
 
 interface PropsType {
   /**
@@ -29,7 +30,7 @@ interface PropsType {
   onRefresh: () => void;
 }
 
-const CollectResourceModal: React.FC<PropsType> = (props) => {
+const CollectSelectModal: React.FC<PropsType> = (props) => {
   const { resource, onOk, visible, collectList, onRefresh } = props;
   const dispatch = useDispatch();
 
@@ -53,6 +54,7 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
           current: current,
           pageSize: 10,
           collectName: name,
+          resourceId: resource.id
         },
       },
     });
@@ -108,6 +110,13 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
     };
   };
 
+  const rowClassName = (record: CollectVo) => {
+    if (record.resourceId) {
+      return 'selectRow';
+    }
+    return '';
+  };
+
   const columns: ColumnsType<CollectVo> = [
     {
       title: '名称',
@@ -138,6 +147,8 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
         </Col>
       </Row>
       <Table
+        rowKey="collectId"
+        rowClassName={rowClassName}
         onRow={onRow}
         dataSource={collectList?.data}
         pagination={pagination}
@@ -150,4 +161,4 @@ const CollectResourceModal: React.FC<PropsType> = (props) => {
 
 export default connect(({ collect: { collectList } }: ModelType) => ({
   collectList: collectList,
-}))(CollectResourceModal);
+}))(CollectSelectModal);
