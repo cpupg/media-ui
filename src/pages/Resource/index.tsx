@@ -91,6 +91,9 @@ const Resource: React.FC<ResourceProps> = () => {
       width: 200,
       ellipsis: true,
       copyable: true,
+      sorter: {
+        multiple: 4,
+      },
     },
     {
       title: '资源目录',
@@ -98,6 +101,7 @@ const Resource: React.FC<ResourceProps> = () => {
       dataIndex: 'dir',
       ellipsis: true,
       copyable: true,
+      sorter: { multiple: 3 },
     },
     {
       title: '作者',
@@ -137,6 +141,7 @@ const Resource: React.FC<ResourceProps> = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       width: 150,
+      sorter: { multiple: 2 },
     },
     {
       title: '更新时间',
@@ -144,6 +149,7 @@ const Resource: React.FC<ResourceProps> = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       width: 150,
+      sorter: { multiple: 1 },
     },
     {
       title: '操作',
