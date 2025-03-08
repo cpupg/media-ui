@@ -16,6 +16,11 @@ interface PropsType {
   total: number;
 }
 
+/**
+ * 专辑详情，展示专辑下的资源。
+ * @param props 属性。
+ * @returns 专辑详情。
+ */
 const Detail: React.FC<PropsType> = (props) => {
   const { albumId, visible, onCancel, dataList, total, albumName } = props;
   const [showResModal, setShowResModal] = useState(false);

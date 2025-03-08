@@ -90,7 +90,7 @@ export interface ResourceData {
   /**
    * 新增的专辑。
    */
-  addedAlbums?: AlbumVo[];
+  addedAlbums?: string[];
 
   /**
    * 删除的标签。

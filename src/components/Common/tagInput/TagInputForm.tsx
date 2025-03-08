@@ -14,7 +14,7 @@ interface PropsType {
   form: FormInstance<any>;
 }
 /**
- * 封装好的标签表单。
+ * 标签表单，只能用来添加新标签，无法复用已有的标签。
  * @param props 属性
  * @returns 标签表单。
  */
@@ -37,7 +37,7 @@ const TagInputForm: React.FC<PropsType> = (props) => {
   };
 
   const onClose = (value: string) => {
-    const arr: string[] = form.getFieldValue(name);
+    const arr: string[] = valueList || [];
     const arr2: string[] = arr.filter((a) => a !== value);
     setValueList(arr2);
     form.setFieldsValue({

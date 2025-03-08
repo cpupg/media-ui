@@ -353,17 +353,33 @@ export interface AlbumVo {
   resourceId: string;
 }
 
+/**
+ * 专辑和资源的关联关系。
+ */
 export interface AlbumResourceVo {
+  /**
+   * 关联id.
+   */
   id?: string;
-
+  /**
+   * 专辑标识。
+   */
   albumId?: string;
-
+  /**
+   * 专辑名。
+   */
   albumName?: string;
-
+  /**
+   * 资源标识。
+   */
   resourceId?: string;
-
+  /**
+   * 资源名。
+   */
   resourceName?: string;
-
+  /**
+   * 资源目录。
+   */
   resourceDir?: string;
 }
 
@@ -439,6 +455,11 @@ export interface CollectVo extends TablePagination {
   * 主键id。
   */
   collectId: string
+
+  /**
+   * 资源标识。
+   */
+  resourceId: string;
 
   /**
   * 收藏名称
