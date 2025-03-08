@@ -85,7 +85,7 @@ export interface ResourceData {
   /**
    * 删除的专辑。
    */
-  deletedAlbums?: AlbumVo[];
+  deletedAlbums?: string[];
 
   /**
    * 新增的专辑。
@@ -95,10 +95,10 @@ export interface ResourceData {
   /**
    * 删除的标签。
    */
-  deletedTags?: TagVo[];
+  deletedTags?: string[];
 
   /**
    * 新增的标签。
    */
-  addedTags?: TagVo[];
+  addedTags?: string[];
 }

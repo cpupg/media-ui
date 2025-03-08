@@ -1,3 +1,4 @@
+import Collect from '@/components/Common/Collect';
 import AuthorInput from '@/components/Common/input/AuthorInput';
 import TagInputModal from '@/components/Common/tagInput/TagInputModal';
 import TagList from '@/components/Common/tagInput/TagList';
@@ -17,7 +18,6 @@ import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
 import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
-import Collect from '@/components/Common/Collect';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -243,6 +243,22 @@ const Resource: React.FC<ResourceProps> = () => {
     selectedRowKeys: selectedRowKeys,
   };
 
+  const checkCondition = (): boolean => {
+    const values = formRef.current?.getFieldsValue();
+    const { filename, dir, authorId, tags } = values;
+    // 批量更新时必须有条件
+    if (
+      (selectedRowKeys && selectedRowKeys.length > 0) ||
+      filename ||
+      dir ||
+      authorId ||
+      (tags && tags.length > 1)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <div>
       <ProTable<ResourceVo>
@@ -283,11 +299,12 @@ const Resource: React.FC<ResourceProps> = () => {
           <BatchUpdateFormModal
             key={3}
             condition={{ params: formRef.current?.getFieldsValue(), idList: selectedRowKeys }}
-            reload={reload}
+            isConditionEmpty={checkCondition}
           />,
         ]}
       />
       {tagModalVisible && (
+        // @ts-expect-error
         <TagInputModal onOk={closeTagModal} visible={tagModalVisible} resource={currentResource} />
       )}
       {modifyVisible && (
