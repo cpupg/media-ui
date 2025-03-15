@@ -3,7 +3,7 @@ import type { ModelType } from '@/types/model';
 import { ResourceData, ResourceParam } from '@/types/request/resource';
 import { TableRequest } from '@/types/request/table';
 import { ModalForm, ProFormText } from '@ant-design/pro-form';
-import { Alert, Button, Form } from 'antd';
+import { Alert, Button, Form, message } from 'antd';
 import React, { useState } from 'react';
 import { connect, useDispatch } from 'umi';
 import AlbumInput from './AlbumInput';
@@ -26,12 +26,16 @@ interface PropsType {
    * 检查更新条件是否为空，true为空，false不为空。
    */
   isConditionEmpty: () => boolean;
+  /**
+   * 提交时的回调。
+   */
+  onSubmit: () => void;
 }
 
 interface PropsType {}
 
 const BatchUpdateFormModal: React.FC<PropsType> = (props) => {
-  const { onCancel, condition, resourceId, isConditionEmpty } = props;
+  const { onCancel, onSubmit, condition, resourceId, isConditionEmpty } = props;
 
   const [form] = Form.useForm<ResourceData>();
 
@@ -41,6 +45,10 @@ const BatchUpdateFormModal: React.FC<PropsType> = (props) => {
   const dispatch = useDispatch();
 
   const onFinish = async (values: any) => {
+    if (isConditionEmpty()) {
+      message.warn('更新条件为空');
+      return;
+    }
     const payload: ResourceData = {
       condition,
       ...values,
@@ -50,6 +58,7 @@ const BatchUpdateFormModal: React.FC<PropsType> = (props) => {
       payload,
     });
     form.resetFields(['addedAlbums', 'addedTags', 'dir']);
+    onSubmit();
     return true;
   };
 

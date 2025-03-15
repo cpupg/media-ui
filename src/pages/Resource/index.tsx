@@ -259,6 +259,10 @@ const Resource: React.FC<ResourceProps> = () => {
     return true;
   };
 
+  const onSubmit = () => {
+    reload();
+  }
+
   return (
     <div>
       <ProTable<ResourceVo>
@@ -298,6 +302,7 @@ const Resource: React.FC<ResourceProps> = () => {
           </Popconfirm>,
           <BatchUpdateFormModal
             key={3}
+            onSubmit={onSubmit}
             condition={{ params: formRef.current?.getFieldsValue(), idList: selectedRowKeys }}
             isConditionEmpty={checkCondition}
           />,

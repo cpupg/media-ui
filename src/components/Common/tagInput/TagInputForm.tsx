@@ -32,7 +32,7 @@ const TagInputForm: React.FC<PropsType> = (props) => {
     vl.push(value);
     setValueList(vl);
     form.setFieldsValue({
-      [name]: valueList,
+      [name]: vl,
     });
   };
 
