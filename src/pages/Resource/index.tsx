@@ -226,6 +226,10 @@ const Resource: React.FC<ResourceProps> = () => {
   const batchDelete = () => {
     const params = formRef.current?.getFieldsValue();
     const idList = selectedRowKeys;
+    if (checkCondition()) {
+      message.warn('请输入查询条件或勾选数据');
+      return;
+    }
     dispatch({
       type: 'resource/batchDelete',
       payload: {
@@ -243,6 +247,10 @@ const Resource: React.FC<ResourceProps> = () => {
     selectedRowKeys: selectedRowKeys,
   };
 
+  /**
+   * 检查批量操作时条件是否为空，true代表没有条件。
+   * @returns true为空。
+   */
   const checkCondition = (): boolean => {
     const values = formRef.current?.getFieldsValue();
     const { filename, dir, authorId, tags } = values;
@@ -261,7 +269,7 @@ const Resource: React.FC<ResourceProps> = () => {
 
   const onSubmit = () => {
     reload();
-  }
+  };
 
   return (
     <div>

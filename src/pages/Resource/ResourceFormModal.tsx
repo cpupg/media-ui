@@ -2,7 +2,7 @@ import AuthorSelectorModal from '@/components/Common/selectorModal/AuthorSelecto
 import type { AuthorVo, ResourceVo } from '@/types/entity';
 import { ModalForm, ProFormText } from '@ant-design/pro-form';
 import { Button, Form } from 'antd';
-import React, { useState } from 'react';
+import React, { FocusEventHandler, useState } from 'react';
 import { useDispatch } from 'umi';
 
 interface PropsType {
@@ -86,6 +86,25 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
     return true;
   };
 
+  const setDir: FocusEventHandler<HTMLInputElement> = (e) => {
+    e.preventDefault();
+    const filename: string = form.getFieldValue('filename');
+    const end = filename.charAt(filename.length - 1);
+    if (end === '/' || end === '\\') {
+      return;
+    }
+    if (filename && (filename.indexOf('/') > -1 || filename.indexOf('\\') > -1)) {
+      const index =
+        filename.lastIndexOf('/') > -1 ? filename.lastIndexOf('/') : filename.lastIndexOf('\\');
+      const dir = filename.substring(0, index);
+      const file = filename.substring(index + 1);
+      form.setFieldsValue({
+        dir: dir,
+        filename: file,
+      });
+    }
+  };
+
   return (
     <ModalForm
       onFinish={onFinish}
@@ -101,6 +120,9 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
         label="资源名称"
         name="filename"
         initialValue={data?.filename}
+        fieldProps={{
+          onBlur: setDir,
+        }}
         rules={[{ required: true, max: 90 }]}
       />
       <ProFormText
