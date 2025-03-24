@@ -24,7 +24,7 @@ interface PropsType {
   /**
    * 资源标识。
    */
-  resourceId: string;
+  resourceId?: string;
   /**
    * 可见性。
    */

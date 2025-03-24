@@ -1,3 +1,4 @@
+import Collect from '@/components/Common/Collect';
 import AuthorInput from '@/components/Common/input/AuthorInput';
 import TagInputModal from '@/components/Common/tagInput/TagInputModal';
 import TagList from '@/components/Common/tagInput/TagList';
@@ -17,7 +18,6 @@ import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
 import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
-import Collect from '@/components/Common/Collect';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -91,6 +91,9 @@ const Resource: React.FC<ResourceProps> = () => {
       width: 200,
       ellipsis: true,
       copyable: true,
+      sorter: {
+        multiple: 4,
+      },
     },
     {
       title: '资源目录',
@@ -98,6 +101,7 @@ const Resource: React.FC<ResourceProps> = () => {
       dataIndex: 'dir',
       ellipsis: true,
       copyable: true,
+      sorter: { multiple: 3 },
     },
     {
       title: '作者',
@@ -137,6 +141,7 @@ const Resource: React.FC<ResourceProps> = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       width: 150,
+      sorter: { multiple: 2 },
     },
     {
       title: '更新时间',
@@ -144,6 +149,7 @@ const Resource: React.FC<ResourceProps> = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       width: 150,
+      sorter: { multiple: 1 },
     },
     {
       title: '操作',
@@ -220,6 +226,10 @@ const Resource: React.FC<ResourceProps> = () => {
   const batchDelete = () => {
     const params = formRef.current?.getFieldsValue();
     const idList = selectedRowKeys;
+    if (checkCondition()) {
+      message.warn('请输入查询条件或勾选数据');
+      return;
+    }
     dispatch({
       type: 'resource/batchDelete',
       payload: {
@@ -235,6 +245,30 @@ const Resource: React.FC<ResourceProps> = () => {
       setSelectedRowKeys(selectedRowKeys);
     },
     selectedRowKeys: selectedRowKeys,
+  };
+
+  /**
+   * 检查批量操作时条件是否为空，true代表没有条件。
+   * @returns true为空。
+   */
+  const checkCondition = (): boolean => {
+    const values = formRef.current?.getFieldsValue();
+    const { filename, dir, authorId, tags } = values;
+    // 批量更新时必须有条件
+    if (
+      (selectedRowKeys && selectedRowKeys.length > 0) ||
+      filename ||
+      dir ||
+      authorId ||
+      (tags && tags.length > 1)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  const onSubmit = () => {
+    reload();
   };
 
   return (
@@ -276,12 +310,14 @@ const Resource: React.FC<ResourceProps> = () => {
           </Popconfirm>,
           <BatchUpdateFormModal
             key={3}
+            onSubmit={onSubmit}
             condition={{ params: formRef.current?.getFieldsValue(), idList: selectedRowKeys }}
-            reload={reload}
+            isConditionEmpty={checkCondition}
           />,
         ]}
       />
       {tagModalVisible && (
+        // @ts-expect-error
         <TagInputModal onOk={closeTagModal} visible={tagModalVisible} resource={currentResource} />
       )}
       {modifyVisible && (

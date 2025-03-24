@@ -19,7 +19,7 @@ interface PropsType {
 const AuthorModal: React.FC<PropsType> = (props) => {
   const { visible, closeModal, reload } = props;
   const [form] = Form.useForm();
-  const [selectedSite, setSelectedSite] = useState({});
+  const [selectedSite, setSelectedSite] = useState<SiteVo>();
   const [page, setPage] = useState(1);
   const [siteVisible, setSiteVisible] = useState(false);
   const dispatch = useDispatch();

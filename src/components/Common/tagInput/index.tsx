@@ -28,15 +28,32 @@ interface PropsType {
    * 标签中的内容。
    */
   valueList?: string[];
+  /**
+   * 点击输入框的回调，必须和readOnly一起使用。
+   */
+  onClick?: () => void;
+  /**
+   * 是否只读，必须和onClick一起使用。
+   */
+  readonly?: boolean;
 }
 
+/*
+组件设计有问题，目前问题：
+1.不支持form，需要在父组件手动封装成form。
+2.父组件TagInputForm不支持使用弹框输入。
+*/
+
 /**
+ * 标签输入框。
+ *
+ * 只用来输入标签，当作表单使用时需要自行在此组件上封装。
  *
  * @param props 属性。
  * @returns 标签输入框。
  */
 const TagInput: React.FC<PropsType> = (props) => {
-  const { onEnter, onClose, close, onValueChange, valueList } = props;
+  const { onEnter, onClose, close, onValueChange, valueList, onClick, readonly } = props;
 
   const [tagList, setTagList] = useState<string[]>([]);
   const [current, setCurrent] = useState('');
@@ -91,11 +108,13 @@ const TagInput: React.FC<PropsType> = (props) => {
     <div className="ant-input" style={{ minHeight: 0 }}>
       {renderTag()}
       <Input
-        placeholder='请输入标签'
+        placeholder="请输入标签"
         onPressEnter={(e) => handleEnter(current)}
         bordered={false}
         // style={{ width: 50 }}
         value={current}
+        onClick={onClick}
+        readOnly={readonly}
         onChange={(e) => onChange(e.target.value)}
       />
       {/* <span>{current}</span> */}

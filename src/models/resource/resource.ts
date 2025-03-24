@@ -81,7 +81,11 @@ const ResourceMode: ResourceModelType = {
     *addResource({ payload }, { call }) {
       const data: ResponseData<any> = yield call(addResource, payload);
       if (parseResponse(data)) {
-        message.success('添加成功, 请刷新页面后查看');
+        if (data.data.id) {
+          message.success('更新成功, 请刷新页面后查看');
+        } else {
+          message.success('添加成功, 请刷新页面后查看');
+        }
       }
     },
     *deleteResource({ payload }, { call }) {
