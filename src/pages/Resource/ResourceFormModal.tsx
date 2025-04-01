@@ -88,7 +88,13 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
 
   const setDir: FocusEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
-    const filename: string = form.getFieldValue('filename');
+    let filename: string = form.getFieldValue('filename');
+    if (filename.startsWith('"')) {
+      filename = filename.substring(1);
+    }
+    if (filename.endsWith('"')) {
+      filename = filename.substring(0, filename.length - 1);
+    }
     const end = filename.charAt(filename.length - 1);
     if (end === '/' || end === '\\') {
       return;
