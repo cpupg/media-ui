@@ -109,6 +109,10 @@ export interface ResourceVo extends E {
    */
   tagReferenceVoList: TagReferenceVo[];
   /**
+   * 标签。
+   */
+  tags: string[];
+  /**
    * 标签数量。
    */
   tagCount: number;

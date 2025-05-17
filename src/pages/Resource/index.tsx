@@ -63,11 +63,10 @@ const Resource: React.FC<ResourceProps> = () => {
 
   const renderTag = (_dom: any, entity: ResourceVo) => {
     // todo 1+n查询方案优化
-    const valueList: string[] = entity.tagReferenceVoList.map((t) => t.tagVo.name);
     return (
-      <Tooltip title={<TagList valueList={valueList} />}>
+      <Tooltip title={<TagList valueList={entity.tags} />}>
         <div>
-          <TagList valueList={valueList} maxCount={entity.tagCount} />
+          <TagList valueList={entity.tags} maxCount={entity.tagCount} />
         </div>
       </Tooltip>
     );
@@ -131,6 +130,7 @@ const Resource: React.FC<ResourceProps> = () => {
       hideInSearch: true,
       hideInForm: true,
       width: 50,
+      align: 'center',
       render: (_, data) => {
         return <RateModal reload={reload} resource={data} />;
       },
