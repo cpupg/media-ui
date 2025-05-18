@@ -49,7 +49,7 @@ const ResourceTag: React.FC<PropsType> = (props) => {
       if (tagList?.map((t) => t.tagVo.name).includes(v)) {
         return;
       }
-      if (v.trim.length == 0) {
+      if (v.trim().length == 0) {
         return;
       }
       dispatch({
