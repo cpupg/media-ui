@@ -87,7 +87,7 @@ const Resource: React.FC<ResourceProps> = () => {
     {
       title: '文件名',
       dataIndex: 'filename',
-      width: 200,
+      // width: 200,
       ellipsis: true,
       copyable: true,
       sorter: {
