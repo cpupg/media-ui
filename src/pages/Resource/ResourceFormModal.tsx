@@ -1,8 +1,10 @@
 import AuthorSelectorModal from '@/components/Common/selectorModal/AuthorSelectorModal';
+import { queryList } from '@/services/author';
 import type { AuthorVo, ResourceVo } from '@/types/entity';
-import { ModalForm, ProFormText } from '@ant-design/pro-form';
+import { TableResponse } from '@/types/response/table';
+import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { Button, Form } from 'antd';
-import React, { FocusEventHandler, useState } from 'react';
+import React, { FocusEventHandler, useEffect, useState } from 'react';
 import { useDispatch } from 'umi';
 
 interface PropsType {
@@ -61,6 +63,21 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
   const [form] = Form.useForm<FormType>();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    queryList({
+      params: { current: 1, pageSize: 20, userId: 'default_user' },
+      sorter: {},
+      filter: {},
+    }).then((res: TableResponse<AuthorVo>) => {
+      if (res.success && res.total == 1) {
+        form.setFieldsValue({
+          authorId: res.data[0].id,
+          authorName: res.data[0].username
+        });
+      }
+    });
+  }, [dispatch]);
+
   const onSelect = (author: AuthorVo) => {
     setSelectedAuthor(author);
     setAuthorVisible(false);
@@ -86,9 +103,30 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
     return true;
   };
 
-  const setDir: FocusEventHandler<HTMLInputElement> = (e) => {
+  const setDir: FocusEventHandler<HTMLTextAreaElement> = (e) => {
     e.preventDefault();
-    let filename: string = form.getFieldValue('filename');
+    const value: string = form.getFieldValue('filename');
+    if (!value) {
+      return;
+    }
+    const filenameArray = value.split('\n');
+    const parsed: string[] = parsePath(filenameArray[0]);
+    const dir = parsed[1];
+    const newValue = filenameArray.reduce((pv: string, cv: string) => {
+      return pv + '\n' + parsePath(cv)[0];
+    }, parsed[0]);
+    form.setFieldsValue({
+      dir,
+      filename: newValue,
+    });
+  };
+
+  /**
+   *
+   * @param filename 解析路径
+   * @returns [文件名，目录]
+   */
+  const parsePath: (arg: string) => string[] = (filename: string) => {
     if (filename.startsWith('"')) {
       filename = filename.substring(1);
     }
@@ -97,17 +135,16 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
     }
     const end = filename.charAt(filename.length - 1);
     if (end === '/' || end === '\\') {
-      return;
+      return [filename, filename];
     }
     if (filename && (filename.indexOf('/') > -1 || filename.indexOf('\\') > -1)) {
       const index =
         filename.lastIndexOf('/') > -1 ? filename.lastIndexOf('/') : filename.lastIndexOf('\\');
       const dir = filename.substring(0, index);
       const file = filename.substring(index + 1);
-      form.setFieldsValue({
-        dir: dir,
-        filename: file,
-      });
+      return [file, dir];
+    } else {
+      return [filename, filename];
     }
   };
 
@@ -122,14 +159,15 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
       width={500}
     >
       {data && <ProFormText hidden={true} name="id" initialValue={data?.id} />}
-      <ProFormText
+      <ProFormTextArea
         label="资源名称"
         name="filename"
         initialValue={data?.filename}
+        placeholder="换行输入多个文件，请确保目录相同"
         fieldProps={{
           onBlur: setDir,
         }}
-        rules={[{ required: true, max: 90 }]}
+        rules={[{ required: true }]}
       />
       <ProFormText
         label="资源目录"

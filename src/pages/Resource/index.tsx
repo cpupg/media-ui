@@ -295,6 +295,9 @@ const Resource: React.FC<ResourceProps> = () => {
             });
             params.tagNames = tagNames;
           }
+          if (params.dir) {
+            params.dir = params.dir.replaceAll('\\', '/').replaceAll('"', '');
+          }
           return fetchResourceList({ params, sorter, filter }).then((v) => {
             if (v.success) {
               return v;
