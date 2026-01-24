@@ -69,14 +69,19 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
       sorter: {},
       filter: {},
     }).then((res: TableResponse<AuthorVo>) => {
-      if (res.success && res.total == 1) {
-        form.setFieldsValue({
-          authorId: res.data[0].id,
-          authorName: res.data[0].username
-        });
+      if (res.success) {
+        for (const author of res.data) {
+          if (author.userId !== 'default_user') {
+            continue;
+          }
+          form.setFieldsValue({
+            authorId: author.id,
+            authorName: author.username,
+          });
+        }
       }
     });
-  }, [dispatch]);
+  });
 
   const onSelect = (author: AuthorVo) => {
     setSelectedAuthor(author);
