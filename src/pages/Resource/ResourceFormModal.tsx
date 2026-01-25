@@ -117,9 +117,14 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
     const filenameArray = value.split('\n');
     const parsed: string[] = parsePath(filenameArray[0]);
     const dir = parsed[1];
-    const newValue = filenameArray.reduce((pv: string, cv: string) => {
-      return pv + '\n' + parsePath(cv)[0];
-    }, parsed[0]);
+    let newValue;
+    if (filenameArray.length == 1) {
+      newValue = parsed[0];
+    } else {
+      newValue = filenameArray.slice(0).reduce((pv: string, cv: string) => {
+        return pv + '\n' + parsePath(cv)[0];
+      }, parsed[0]);
+    }
     form.setFieldsValue({
       dir,
       filename: newValue,
