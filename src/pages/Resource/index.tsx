@@ -83,7 +83,17 @@ const Resource: React.FC<ResourceProps> = () => {
     }
   };
 
+  const renderRowNumber = (dom: React.ReactNode, entity: object, index: number) => {
+    return index + 1;
+  };
+
   const columns: ProColumns<ResourceVo>[] = [
+    {
+      title: '序号',
+      render: renderRowNumber,
+      width: 50,
+      align: 'center',
+    },
     {
       title: '文件名',
       dataIndex: 'filename',
