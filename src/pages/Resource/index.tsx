@@ -93,6 +93,7 @@ const Resource: React.FC<ResourceProps> = () => {
       render: renderRowNumber,
       width: 50,
       align: 'center',
+      hideInSearch: true
     },
     {
       title: '文件名',
