@@ -6,10 +6,10 @@ import ImageUpload from '@/components/Common/upload/ImageUpload';
 import { fetchResourceList } from '@/services/resource/resource';
 import type { ResourceVo } from '@/types/entity';
 import type { ModelType } from '@/types/model';
-import { ProFormInstance } from '@ant-design/pro-form';
+import { ProFormCheckbox, ProFormInstance } from '@ant-design/pro-form';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, Modal, Popconfirm, Tooltip, message } from 'antd';
+import { Button, Col, Input, Modal, Popconfirm, Row, Tooltip, message } from 'antd';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import copy from 'copy-to-clipboard';
 import React, { useRef, useState } from 'react';
@@ -18,6 +18,8 @@ import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
 import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
+import FormItemInput from 'antd/lib/form/FormItemInput';
+import { FormInstance } from 'antd/es/form/Form';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -37,6 +39,7 @@ const Resource: React.FC<ResourceProps> = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>();
   const [showCollect, setShowCollect] = useState(false);
+  const [dir, setDir] = useState<string>();
 
   const reload = () => {
     actionRef.current?.reload();
@@ -87,13 +90,47 @@ const Resource: React.FC<ResourceProps> = () => {
     return index + 1;
   };
 
+  const onDirChange = (e: React.ChangeEvent<HTMLInputElement>, form: FormInstance) => {
+    setDir(e.target.value);
+    form.setFieldsValue({
+      dir: e.target.value,
+    });
+  };
+
+  const onAccurateDirChange = (e, form) => {
+    form.setFieldsValue({
+      dir,
+    });
+  };
+
+  const renderFormItem = (schema: ProColumns, config: any, form: FormInstance) => {
+    // 资源搜索框是两个input，共用一个onchange，因此使用state控制目录输入框，多选框由antd控制。
+    return (
+      <Row>
+        <Col span={20}>
+          <Input value={dir} onChange={(e) => onDirChange(e, form)} />
+        </Col>
+        <Col span={4}>
+          <ProFormCheckbox
+            label="精确查询"
+            name="accurateDir"
+            fieldProps={{
+              defaultChecked: true,
+              onChange: (e) => onAccurateDirChange(e, form),
+            }}
+          />
+        </Col>
+      </Row>
+    );
+  };
+
   const columns: ProColumns<ResourceVo>[] = [
     {
       title: '序号',
       render: renderRowNumber,
       width: 50,
       align: 'center',
-      hideInSearch: true
+      hideInSearch: true,
     },
     {
       title: '文件名',
@@ -112,6 +149,7 @@ const Resource: React.FC<ResourceProps> = () => {
       ellipsis: true,
       copyable: true,
       sorter: { multiple: 3 },
+      renderFormItem,
     },
     {
       title: '作者',
@@ -306,8 +344,9 @@ const Resource: React.FC<ResourceProps> = () => {
             });
             params.tagNames = tagNames;
           }
-          if (params.dir) {
-            params.dir = params.dir.replaceAll('\\', '/').replaceAll('"', '');
+          // 资源搜索框是两个input，共用一个onchange，因此使用state控制目录输入框，多选框由antd控制。
+          if (dir) {
+            params.dir = dir.replaceAll('\\', '/').replaceAll('"', '');
           }
           return fetchResourceList({ params, sorter, filter }).then((v) => {
             if (v.success) {
