@@ -81,7 +81,7 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
         }
       }
     });
-  });
+  }, [dispatch]);
 
   const onSelect = (author: AuthorVo) => {
     setSelectedAuthor(author);

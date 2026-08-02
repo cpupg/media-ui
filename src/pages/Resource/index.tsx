@@ -10,6 +10,7 @@ import { ProFormCheckbox, ProFormInstance } from '@ant-design/pro-form';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Col, Input, Modal, Popconfirm, Row, Tooltip, message } from 'antd';
+import { FormInstance } from 'antd/es/form/Form';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import copy from 'copy-to-clipboard';
 import React, { useRef, useState } from 'react';
@@ -18,8 +19,6 @@ import Album from './Album';
 import BatchUpdateFormModal from './BatchUpdateFormModal';
 import RateModal from './RateModal';
 import ResourceFormModal from './ResourceFormModal';
-import FormItemInput from 'antd/lib/form/FormItemInput';
-import { FormInstance } from 'antd/es/form/Form';
 interface ResourceProps {
   resourceList: ResourceVo[];
 }
@@ -346,7 +345,11 @@ const Resource: React.FC<ResourceProps> = () => {
           }
           // 资源搜索框是两个input，共用一个onchange，因此使用state控制目录输入框，多选框由antd控制。
           if (dir) {
-            params.dir = dir.replaceAll('\\', '/').replaceAll('"', '');
+            let td = dir.toLowerCase().replaceAll('\\', '/').replaceAll('"', '');
+            if(!td.endsWith('/')) {
+              td = td + '/';
+            }
+            params.dir = td;
           }
           return fetchResourceList({ params, sorter, filter }).then((v) => {
             if (v.success) {
