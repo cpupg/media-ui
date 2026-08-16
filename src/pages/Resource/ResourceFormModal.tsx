@@ -15,7 +15,7 @@ interface PropsType {
   /**
    * 关闭弹框。
    */
-  onCancel?: () => void;
+  onCancel: () => void;
   /**
    * 要修改的资源。
    */
@@ -32,6 +32,10 @@ interface FormType {
    * 资源对应的文件名。
    */
   filename: string;
+  /**
+   * 文件名列表。
+   */
+  filenames: string[];
   /**
    * 资源所在目录。
    */
@@ -55,7 +59,7 @@ interface FormType {
 }
 
 const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
-  const { reload, data, visible, onCancel } = props;
+  const { reload, data, onCancel } = props;
 
   const [authorVisible, setAuthorVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -98,7 +102,8 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
       payload: {
         authorId: values.authorId,
         dir: values.dir,
-        filename: values.filename,
+        filename: values.filenames[0],
+        filenames: values.filenames,
         id: values.id,
       },
     });
@@ -116,18 +121,20 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
     }
     const filenameArray = value.split('\n');
     const parsed: string[] = parsePath(filenameArray[0]);
-    const dir = parsed[1];
+    const dir = form.getFieldValue('dir') || parsed[1];
     let newValue;
     if (filenameArray.length == 1) {
       newValue = parsed[0];
     } else {
-      newValue = filenameArray.slice(0).reduce((pv: string, cv: string) => {
+      newValue = filenameArray.slice(1).reduce((pv: string, cv: string) => {
         return pv + '\n' + parsePath(cv)[0];
       }, parsed[0]);
     }
     form.setFieldsValue({
       dir,
+      // filename有长度限制，批量输入会超长。
       filename: newValue,
+      filenames: filenameArray
     });
   };
 
@@ -158,13 +165,18 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
     }
   };
 
+  const resetForm = () => {
+    onCancel();
+    form.resetFields();
+  }
+
   return (
     <ModalForm
       onFinish={onFinish}
       title={data ? `修改资源【${data.filename}】` : '添加资源'}
       trigger={<Button type="primary">新建</Button>}
-      modalProps={{ onCancel: onCancel }}
-      visible={visible}
+      modalProps={{ onCancel: resetForm }}
+      // visible={visible}
       form={form}
       width={500}
     >
@@ -179,6 +191,7 @@ const ResourceFormModal: React.FC<PropsType> = (props: PropsType) => {
         }}
         rules={[{ required: true }]}
       />
+      <ProFormText name='filenames' hidden/>
       <ProFormText
         label="资源目录"
         name="dir"

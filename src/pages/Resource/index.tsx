@@ -346,7 +346,7 @@ const Resource: React.FC<ResourceProps> = () => {
           // 资源搜索框是两个input，共用一个onchange，因此使用state控制目录输入框，多选框由antd控制。
           if (dir) {
             let td = dir.toLowerCase().replaceAll('\\', '/').replaceAll('"', '');
-            if(!td.endsWith('/')) {
+            if (!td.endsWith('/')) {
               td = td + '/';
             }
             params.dir = td;
@@ -360,7 +360,16 @@ const Resource: React.FC<ResourceProps> = () => {
           });
         }}
         toolBarRender={() => [
-          <ResourceFormModal key={1} reload={reload} />,
+          <ResourceFormModal
+            key={1}
+            reload={reload}
+            data={resToModify}
+            visible={modifyVisible}
+            onCancel={() => {
+              setModifyVisible(false);
+              setResToModify(undefined);
+            }}
+          />,
           <Popconfirm key={2} title="批量删除" onConfirm={batchDelete}>
             <Button>批量删除</Button>
           </Popconfirm>,
@@ -375,21 +384,6 @@ const Resource: React.FC<ResourceProps> = () => {
       {tagModalVisible && (
         // @ts-expect-error
         <TagInputModal onOk={closeTagModal} visible={tagModalVisible} resource={currentResource} />
-      )}
-      {modifyVisible && (
-        <ResourceFormModal
-          data={resToModify}
-          visible={modifyVisible}
-          reload={() => {
-            reload();
-            setModifyVisible(false);
-            setResToModify(undefined);
-          }}
-          onCancel={() => {
-            setModifyVisible(false);
-            setResToModify(undefined);
-          }}
-        />
       )}
       {albumVisible && (
         <Album
